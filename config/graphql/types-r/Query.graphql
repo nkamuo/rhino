@@ -1,0 +1,22 @@
+
+type Query{
+    version: String
+    # shiments(
+    #     first: Int,
+    #     after: String
+    #     filter: String,
+    #     sort: String
+    # ): ShipmentRequestConnection
+}
+
+
+
+type ClientQuery{
+    shiments(
+        first: Int,
+        after: String
+        filter: String,
+        sort: String
+    ): ShipmentRequestConnection
+}
+

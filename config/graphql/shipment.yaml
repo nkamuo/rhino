@@ -1,0 +1,8 @@
+services:
+  App\GraphQL\Shipment\ResolverMap\ShipmentResolverMap:
+    # only for sf < 3.3
+    #class: App\GraphQL\Resolver\Greetings
+    tags:
+      - { name: overblog_graphql.resolver_map, schema: default, priority: 10 }
+      # - { name: overblog_graphql.query, method: sayHello, alias: shipments } # add alias say_hello
+      # - { name: overblog_graphql.query, method: shipments } # add service id "App\GraphQL\Resolver\Greetings"

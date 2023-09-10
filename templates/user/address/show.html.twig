@@ -1,0 +1,74 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}UserAddress{% endblock %}
+
+{% block body %}
+    <h1>UserAddress</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ user_address.id }}</td>
+            </tr>
+            <tr>
+                <th>FirstName</th>
+                <td>{{ user_address.firstName }}</td>
+            </tr>
+            <tr>
+                <th>LastName</th>
+                <td>{{ user_address.lastName }}</td>
+            </tr>
+            <tr>
+                <th>PhoneNumber</th>
+                <td>{{ user_address.phoneNumber }}</td>
+            </tr>
+            <tr>
+                <th>EmailAddress</th>
+                <td>{{ user_address.emailAddress }}</td>
+            </tr>
+            <tr>
+                <th>Company</th>
+                <td>{{ user_address.company }}</td>
+            </tr>
+            <tr>
+                <th>CountryCode</th>
+                <td>{{ user_address.countryCode }}</td>
+            </tr>
+            <tr>
+                <th>ProvinceCode</th>
+                <td>{{ user_address.provinceCode }}</td>
+            </tr>
+            <tr>
+                <th>ProvinceName</th>
+                <td>{{ user_address.provinceName }}</td>
+            </tr>
+            <tr>
+                <th>City</th>
+                <td>{{ user_address.city }}</td>
+            </tr>
+            <tr>
+                <th>Street</th>
+                <td>{{ user_address.street }}</td>
+            </tr>
+            <tr>
+                <th>Postcode</th>
+                <td>{{ user_address.postcode }}</td>
+            </tr>
+            <tr>
+                <th>UpdatedAt</th>
+                <td>{{ user_address.updatedAt ? user_address.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>CreatedAt</th>
+                <td>{{ user_address.createdAt ? user_address.createdAt|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_user_address_index') }}">back to list</a>
+
+    <a href="{{ path('app_user_address_edit', {'id': user_address.id}) }}">edit</a>
+
+    {{ include('user/address/_delete_form.html.twig') }}
+{% endblock %}

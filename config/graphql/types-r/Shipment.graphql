@@ -1,0 +1,25 @@
+
+type ShipmentRequest{
+    id: Ulid
+    owner: User!
+    items: [ShipmentItem!]!
+
+}
+
+
+type ShipmentItem{
+    id: Ulid
+    owner: ShipmentRequest
+}
+
+
+type ShipmentRequestConnection{
+    totalCount: Int,
+    pageInfo: PageInfo
+    edges: [ShipmentRequestEdge!]
+}
+
+type ShipmentRequestEdge{
+    node: ShipmentRequest
+    cursor: String
+}

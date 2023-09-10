@@ -1,0 +1,21 @@
+overblog_graphql:
+    definitions:
+        schema:
+            query: Query
+            mutation: Mutation
+        mappings:
+            types:
+                - # type: yaml
+                  types: [yaml, graphql] # to include different types from the same dir
+                  dir: "%kernel.project_dir%/config/graphql/types"
+                  suffix: null
+
+                -
+                    type: attribute
+                    dir: "%kernel.project_dir%/src/Entity"
+                    suffix: null
+
+                -
+                    type: attribute
+                    dir: "%kernel.project_dir%/src/GraphQL"
+                    suffix: null

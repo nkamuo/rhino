@@ -1,0 +1,38 @@
+{% extends 'base.html.twig' %}
+{% form_theme registrationForm 'tailwind_2_layout.html.twig' %}
+
+{% block javascripts %}
+{{parent()}}
+<script src="https://cdn.tailwindcss.com"></script>
+{% endblock%}
+
+{% block title %}Register
+{% endblock %}
+
+{% block body %}
+	{% for flash_error in app.flashes('verify_email_error') %}
+		<div class="alert alert-danger" role="alert">{{ flash_error }}</div>
+	{% endfor %}
+
+	<h1>Register</h1>
+
+	{{ form_errors(registrationForm) }}
+
+	{{ form_start(registrationForm) }}
+	{# {{ form_row(registrationForm.email) }} #}
+	{{ form_row(registrationForm.email, {
+    row_class: 'mt-2 px-3 ...',
+    label_class: 'font-semibold text-gray-600 ...',
+    error_item_class: 'text-red-700 ...',
+    widget_class: 'border border-gray-200 bg-gray-50 ...',
+    widget_disabled_class: 'border-dashed text-gray-200 ...',
+    widget_errors_class: 'border-double border-red-500 bg-red-50 ...',
+}) }}
+	{{ form_row(registrationForm.plainPassword, {
+            label: 'Password'
+        }) }}
+	{{ form_row(registrationForm.agreeTerms) }}
+
+	<button type="submit" class="btn">Register</button>
+	{{ form_end(registrationForm) }}
+{% endblock %}
