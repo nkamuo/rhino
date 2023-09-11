@@ -5,6 +5,8 @@ namespace App\Entity\Catalog;
 use App\Repository\Catalog\ProductPriceRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Overblog\GraphQLBundle\Annotation as GQL;
+use Symfony\Bridge\Doctrine\Types\UlidType;
+use Symfony\Component\Uid\Ulid;
 
 #[GQL\Type()]
 #[ORM\Entity(repositoryClass: ProductPriceRepository::class)]
@@ -12,9 +14,10 @@ class ProductPrice
 {
     #[GQL\Field(type: "Ulid")]
     #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column]
-    private ?int $id = null;
+    #[ORM\Column(type: UlidType::NAME, unique: true)]
+    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
+    #[ORM\CustomIdGenerator(class: 'doctrine.ulid_generator')]
+    private ?Ulid $id = null;
 
     #[GQL\Field()]
     #[ORM\Column(length: 3)]
@@ -24,7 +27,7 @@ class ProductPrice
     #[ORM\Column]
     private ?int $amount = null;
 
-    public function getId(): ?int
+    public function getId(): ?Ulid
     {
         return $this->id;
     }

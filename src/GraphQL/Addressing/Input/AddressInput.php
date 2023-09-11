@@ -4,9 +4,10 @@ namespace App\GraphQL\Addressing\Input;
 
 use App\Entity\Addressing\Address;
 use Overblog\GraphQLBundle\Annotation as GQL;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[GQL\Input()]
-class AddressInput
+abstract class AddressInput
 {
     #[GQL\Field()]
     public ?string $firstName = null;
@@ -23,6 +24,7 @@ class AddressInput
     #[GQL\Field()]
     public ?string $company = null;
 
+    #[Assert\Length(exactly: 3)]
     #[GQL\Field()]
     public ?string $countryCode = null;
 

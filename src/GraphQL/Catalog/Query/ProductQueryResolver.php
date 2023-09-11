@@ -33,7 +33,7 @@ class ProductQueryResolver
 
     #[Query(name: "get_product_item",)]
     #[GQL\Arg(
-        name: 'name',
+        name: 'id',
         type: 'Ulid'
     )]
     public function getProductItem(
@@ -63,6 +63,7 @@ class ProductQueryResolver
         ?int $first,
         ?String $after,
         ?String $filter,
+        ?String $sort,
     ): ProductConnection {
 
 

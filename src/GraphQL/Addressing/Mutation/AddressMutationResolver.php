@@ -4,7 +4,7 @@ namespace App\GraphQL\Addressing\Mutation;
 use App\Entity\Account\User;
 use App\Entity\Addressing\Address;
 use App\Entity\Addressing\UserAddress;
-use App\GraphQL\Addressing\Input\AddressInput;
+use App\GraphQL\Addressing\Input\AddressCreationInput;
 use App\Repository\Addressing\AddressRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Overblog\GraphQLBundle\Annotation as GQL;
@@ -24,7 +24,7 @@ class AddressMutationResolver
     }
 
     #[GQL\Mutation()]
-    public function createNewAddress(AddressInput $input): Address{
+    public function createNewAddress(AddressCreationInput $input): Address{
 
         $user = $this->security->getUser();
         if(!($user instanceof User)){

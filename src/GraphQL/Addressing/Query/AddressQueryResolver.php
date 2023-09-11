@@ -33,7 +33,7 @@ class AddressQueryResolver
 
     #[Query(name: "get_address_item",)]
     #[GQL\Arg(
-        name: 'name',
+        name: 'id',
         type: 'Ulid'
     )]
     public function getAddressItem(

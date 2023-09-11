@@ -2,6 +2,7 @@
 
 namespace App\GraphQL\Catalog\Input;
 
+use App\Entity\Catalog\Product;
 use Overblog\GraphQLBundle\Annotation as GQL;
 
 #[GQL\Input()]
@@ -14,8 +15,18 @@ class ProductInput
     public ?string $description;
 
     #[GQL\Field()]
-    public ?ProductPriceInput $price;
+    public ?ProductPriceInput $price = null;
 
     #[GQL\Field()]
-    public ?ProductDimensionInput $dimension;
+    public ProductDimensionInput $dimension;
+
+    public function build(Product $product): void
+    {
+        $product
+            ->setTitle($this->title)
+            ->setDescription($this->description)
+            ->setPrice($this->price?->toInstance())
+            ->setDimension($this->dimension?->toInstance())
+            ;
+    }
 }

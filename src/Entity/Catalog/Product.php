@@ -32,10 +32,11 @@ class Product
     #[ORM\OneToOne(cascade: ['persist', 'remove'])]
     private ?ProductPrice $price = null;
 
+    #[GQL\Field()]
     #[ORM\OneToOne(cascade: ['persist', 'remove'])]
     private ?ProductDimension $dimension = null;
 
-    public function getId(): ?int
+    public function getId(): ?Ulid
     {
         return $this->id;
     }
