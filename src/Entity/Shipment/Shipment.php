@@ -24,40 +24,71 @@ class Shipment
     private ?Ulid $id = null;
 
     #[GQL\Field()]
+    #[ORM\Column(length: 64, enumType: ShipmentType::class)]
+    private ?ShipmentType $type = null;
+
+    #[GQL\Field()]
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
     private ?User $owner = null;
 
     #[GQL\Field()]
-    #[ORM\ManyToOne]
+    #[ORM\ManyToOne(cascade: ['persist',])]
     private ?UserAddress $billingAddress = null;
 
     #[GQL\Field()]
-    #[ORM\ManyToOne]
+    #[ORM\ManyToOne(cascade: ['persist',])]
     private ?UserAddress $originAddress = null;
 
     #[GQL\Field()]
-    #[ORM\ManyToOne]
+    #[ORM\ManyToOne(cascade: ['persist',])]
     private ?UserAddress $destinationAddress = null;
 
     #[GQL\Field(type:'[ShipmentItem!]!')]
-    #[ORM\OneToMany(mappedBy: 'shipment', targetEntity: ShipmentItem::class, orphanRemoval: true)]
+    #[ORM\OneToMany(mappedBy: 'shipment', targetEntity: ShipmentItem::class, cascade: ['persist', 'remove'], orphanRemoval: true)]
     private Collection $items;
 
     #[GQL\Field(type:'[ShipmentDriverBid!]!')]
-    #[ORM\OneToMany(mappedBy: 'shipment', targetEntity: ShipmentDriverBid::class, orphanRemoval: true)]
+    #[ORM\OneToMany(mappedBy: 'shipment', targetEntity: ShipmentDriverBid::class, cascade: ['persist', 'remove'], orphanRemoval: true)]
     private Collection $bids;
+
+    #[GQL\Field()]
+    #[ORM\OneToOne(inversedBy: 'shipment', cascade: ['persist', 'remove'])]
+    private ?ShipmentBudget $budget = null;
+
+    #[GQL\Field(type: "DateTime")]
+    #[ORM\Column(nullable: true)]
+    private ?\DateTimeImmutable $updatedAt = null;
+
+    #[GQL\Field(type: "DateTime")]
+    #[ORM\Column()]
+    private ?\DateTimeImmutable $createdAt = null;
+
 
     public function __construct(?Ulid $id = null)
     {
         $this->id = $id;
         $this->items = new ArrayCollection();
         $this->bids = new ArrayCollection();
+        $this->createdAt = new \DateTimeImmutable();
     }
 
     public function getId(): ?Ulid
     {
         return $this->id;
+    }
+
+    
+    public function getType(): ?ShipmentType
+    {
+        return $this->type;
+    }
+
+    public function setType(ShipmentType $type): static
+    {
+        $this->type = $type;
+
+        return $this;
     }
 
     public function getOwner(): ?User
@@ -167,4 +198,41 @@ class Shipment
 
         return $this;
     }
+
+    public function getBudget(): ?ShipmentBudget
+    {
+        return $this->budget;
+    }
+
+    public function setBudget(?ShipmentBudget $budget): static
+    {
+        $this->budget = $budget;
+
+        return $this;
+    }
+
+    public function getUpdatedAt(): ?\DateTimeImmutable
+    {
+        return $this->updatedAt;
+    }
+
+    public function setUpdatedAt(?\DateTimeImmutable $updatedAt): static
+    {
+        $this->updatedAt = $updatedAt;
+
+        return $this;
+    }
+
+    public function getCreatedAt(): ?\DateTimeImmutable
+    {
+        return $this->createdAt;
+    }
+
+    public function setCreatedAt(?\DateTimeImmutable $createdAt): static
+    {
+        $this->createdAt = $createdAt;
+
+        return $this;
+    }
+
 }

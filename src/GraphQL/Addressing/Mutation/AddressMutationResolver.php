@@ -28,7 +28,7 @@ class AddressMutationResolver
 
         $user = $this->security->getUser();
         if(!($user instanceof User)){
-            throw new UserError("Permission Denied: You may not perform the said operation");
+            throw new UserError("Permission Denied: You may not perform this operation");
         }
         $address = new UserAddress();
         $input->build($address);

@@ -28,9 +28,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\CustomIdGenerator(class: 'doctrine.ulid_generator')]
     private ?Ulid $id = null;
 
+    #[GQL\Field()]
     #[ORM\Column(length: 180, unique: true)]
     private ?string $email = null;
 
+    /**
+     * @var string[]
+     */
+    #[GQL\Field()]
     #[ORM\Column]
     private array $roles = [];
 
@@ -40,21 +45,26 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private ?string $password = null;
 
+    #[GQL\Field()]
     #[ORM\Column(length: 64)]
     private ?string $firstName = null;
 
+    #[GQL\Field()]
     #[ORM\Column(length: 64)]
     private ?string $lastName = null;
 
+    #[GQL\Field()]
     #[ORM\Column(length: 64, nullable: true)]
     private ?string $phone = null;
 
+    #[GQL\Field()]
     #[ORM\Column(type: 'boolean')]
-    private $isVerified = false;
+    private bool $isVerified = false;
 
     #[ORM\OneToMany(mappedBy: 'owner', targetEntity: UserAddress::class, orphanRemoval: true)]
     private Collection $addressess;
 
+    #[GQL\Field()]
     #[ORM\OneToOne(mappedBy: 'userAccount', cascade: ['persist', 'remove'])]
     private ?Driver $driver = null;
 
@@ -98,6 +108,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $roles = $this->roles;
         // guarantee every user at least has ROLE_USER
         $roles[] = 'ROLE_USER';
+
+        if($this->driver != null){
+            $roles[] = 'ROLE_DRIVER';
+        }
 
         return array_unique($roles);
     }

@@ -49,6 +49,12 @@ class ShipmentItem
     #[ORM\Column]
     private ?\DateTimeImmutable $createdAt = null;
 
+
+    public function __construct(?Ulid $id = null){
+        $this->id = $id;
+        $this->createdAt = new \DateTimeImmutable();
+    }
+
     public function getId(): ?Ulid
     {
         return $this->id;

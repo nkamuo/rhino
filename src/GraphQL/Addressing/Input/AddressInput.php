@@ -9,6 +9,10 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[GQL\Input()]
 abstract class AddressInput
 {
+    
+    #[GQL\Field()]
+    public ?string $googleId = null;
+
     #[GQL\Field()]
     public ?string $firstName = null;
 
@@ -50,6 +54,7 @@ abstract class AddressInput
 
     public function build(Address $address):void{
         $address
+            ->setGoogleId($this->googleId)
             ->setFirstName($this->firstName)
             ->setLastName($this->lastName)
             ->setPhoneNumber($this->phoneNumber)

@@ -16,5 +16,5 @@ class ShipmentItemInput
     public int $quantity;
 
     #[GQL\Field()]
-    public ?string $description;
+    public ?string $description = null;
 }
