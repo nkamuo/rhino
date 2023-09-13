@@ -6,6 +6,7 @@ use App\Entity\Account\User;
 use App\Entity\Addressing\Address;
 use App\Entity\Addressing\UserAddress;
 use App\GraphQL\Addressing\Input\AddressCreationInput;
+use App\GraphQL\Addressing\Input\AddressUpdateInput;
 use App\GraphQL\Addressing\Type\AddressConnection;
 use App\GraphQL\Addressing\Type\AddressEdge;
 use App\Repository\Addressing\AddressRepository;
@@ -56,11 +57,11 @@ class ClientAddressResolver
             );
         }
 
-        if (!$this->security->isGranted('view', $address)) {
-            throw new UserError(
-                message: "Permision Denied: You may not view this resource"
-            );
-        }
+        // if (!$this->security->isGranted('view', $address)) {
+        //     throw new UserError(
+        //         message: "Permision Denied: You may not view this resource"
+        //     );
+        // }
 
 
 
@@ -126,6 +127,59 @@ class ClientAddressResolver
         $this->entityManager->persist($address);
         $this->entityManager->flush();
 
+        return $address;
+    }
+
+
+
+
+
+    #[GQL\Mutation()]
+    #[GQL\Arg(
+        name: 'id',
+        type: 'Ulid!'
+    )]
+    #[GQL\Arg(
+        name: 'input',
+        type: 'AddressUpdateInput!'
+    )]
+    public function updateAddress(Ulid $id,  AddressUpdateInput $input): Address
+    {
+        $address = $this->getAddressById($id);
+        $user = $this->getUser();
+
+        $input->build($address);
+
+        $this->entityManager->persist($address);
+        $this->entityManager->flush();
+
+        return $address;
+    }
+
+
+
+    private function getUser(): User
+    {
+        $user = $this->security->getUser();
+        if (!($user instanceof User)) {
+            throw new UserError("Permission Denied: You may not perform this operation");
+        }
+        return $user;
+    }
+
+
+    private function getAddressById(Ulid $id): Address
+    {
+        $user = $this->getUser();
+        $address = $this->addressRepository->find($id);
+        if ($address === null) {
+            throw new UserError(
+                message: "Cannot find address with [id:$id]"
+            );
+        }
+        if ($address->getOwner() !== $user) {
+            throw new UserError("Permission Denied: You may not perform this operation");
+        }
         return $address;
     }
 }

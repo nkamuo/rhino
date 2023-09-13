@@ -6,6 +6,7 @@ use App\Entity\Account\User;
 use App\Entity\Catalog\Product;
 use App\Entity\Catalog\UserProduct;
 use App\GraphQL\Catalog\Input\ProductCreationInput;
+use App\GraphQL\Catalog\Input\ProductUpdateInput;
 use App\GraphQL\Catalog\Type\ProductConnection;
 use App\GraphQL\Catalog\Type\ProductEdge;
 use App\Repository\Catalog\ProductRepository;
@@ -24,7 +25,10 @@ use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Uid\Ulid;
 
 
-#[GQL\Provider()]
+#[GQL\Provider(
+    targetQueryTypes: ['ClientQuery'],
+    targetMutationTypes: ['ClientMutation']
+)]
 class ClientProductResolver
 {
 
@@ -46,18 +50,13 @@ class ClientProductResolver
         #[GQL\Arg(type: 'Ulid')] Ulid $id
     ): Product {
 
-        $product = $this->productRepository->find($id);
-        if ($product === null) {
-            throw new UserError(
-                message: "Cannot find product with [id:$id]"
-            );
-        }
+        $product = $this->getProductById($id);
 
-        if (!$this->security->isGranted('view', $product)) {
-            throw new UserError(
-                message: "Permision Denied: You may not view this resource"
-            );
-        }
+        // if (!$this->security->isGranted('view', $product)) {
+        //     throw new UserError(
+        //         message: "Permision Denied: You may not view this resource"
+        //     );
+        // }
 
 
 
@@ -73,11 +72,8 @@ class ClientProductResolver
         ?String $sort,
     ): ProductConnection {
 
-        $user = $this->security->getUser();
-        if (!($user instanceof User)) {
-            throw new UserError("Permission Denied: You may not perform this operation");
-        }
-
+        $user = $this->getUser();
+        
         $cb = new ConnectionBuilder(
             null,
             fn ($edges, PageInfoInterface $pageInfo) => new ProductConnection($edges, $pageInfo),
@@ -107,13 +103,14 @@ class ClientProductResolver
     }
 
 
-    
+
 
     #[GQL\Mutation()]
-    public function createNewProduct(ProductCreationInput $input): Product{
-        
+    public function createNewProduct(ProductCreationInput $input): Product
+    {
+
         $user = $this->security->getUser();
-        if(!($user instanceof User)){
+        if (!($user instanceof User)) {
             throw new UserError("Permission Denied: You may not perform this operation");
         }
 
@@ -124,6 +121,55 @@ class ClientProductResolver
         $this->entityManager->persist($product);
         $this->entityManager->flush();
 
+        return $product;
+    }
+
+    
+
+    #[GQL\Mutation()]
+    #[GQL\Arg(
+        name: 'id',
+        type: 'Ulid!'
+    )]
+    #[GQL\Arg(
+        name: 'input',
+        type: 'ProductUpdateInput!'
+    )]
+    public function updateProduct(Ulid $id, ProductUpdateInput $input): Product
+    {
+        $product = $this->getProductById($id);
+        $input->build($product);
+
+        $this->entityManager->persist($product);
+        $this->entityManager->flush();
+
+        return $product;
+    }
+
+
+
+
+
+    private function getUser(): User{
+        $user = $this->security->getUser();
+        if (!($user instanceof User)) {
+            throw new UserError("Permission Denied: You may not perform this operation");
+        }
+        return $user;
+    }
+
+
+    private function getProductById(Ulid $id): Product{
+        $user = $this->getUser();
+        $product = $this->productRepository->find($id);
+        if ($product === null) {
+            throw new UserError(
+                message: "Cannot find product with [id:$id]"
+            );
+        }
+        if($product->getOwner() !== $user){
+            throw new UserError("Permission Denied: You may not perform this operation");
+        }
         return $product;
     }
 }
