@@ -1,8 +1,8 @@
 <?php
 
-namespace App\GraphQL\Shipment\Query;
+namespace App\GraphQL\Shipment\Resolver;
 
-
+use App\Entity\Account\User;
 use App\Entity\Shipment\Shipment;
 use App\GraphQL\Shipment\Type\ShipmentConnection;
 use App\GraphQL\Shipment\Type\ShipmentEdge;
@@ -15,12 +15,16 @@ use Overblog\GraphQLBundle\Error\UserError;
 use Overblog\GraphQLBundle\Relay\Connection\ConnectionBuilder;
 use Overblog\GraphQLBundle\Relay\Connection\PageInfoInterface;
 use Overblog\GraphQLBundle\Relay\Connection\Paginator;
+use Symfony\Bridge\Doctrine\Types\UlidType;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Uid\Ulid;
 
 
-#[GQL\Provider()]
-class ShipmentQueryResolver
+#[GQL\Provider(
+    targetQueryTypes: ['DriverQuery'],
+    targetMutationTypes: ['DriverMutation'],
+)]
+class DriverShipmentResolver
 {
 
     public function __construct(
@@ -28,7 +32,6 @@ class ShipmentQueryResolver
         private Security $security,
     ) {
     }
-
 
 
     #[Query(name: "get_shipment_item",)]
@@ -59,25 +62,32 @@ class ShipmentQueryResolver
     }
 
     #[GQL\Query(name: "get_shipment_list")]
+    #[GQL\Access("isGranted('ROLE_USER')")]
     public function getShipmentConnection(
         ?int $first,
         ?String $after,
         ?String $filter,
+        ?String $sort,
     ): ShipmentConnection {
-
 
         $cb = new ConnectionBuilder(
             null,
             fn ($edges, PageInfoInterface $pageInfo) => new ShipmentConnection($edges, $pageInfo),
-            fn (string $coursor, Shipment $brand, int $index) => new ShipmentEdge($coursor, $brand)
+            fn (string $coursor, Shipment $shipment, int $index) => new ShipmentEdge($coursor, $shipment)
         );
 
         $qb = $this->shipmentRepository->createQueryBuilder('shipment');
+
+
         QueryBuilderHelper::applyCriteria($qb, $filter, 'shipment');
 
         $total = fn () => (int) (clone $qb)->select('COUNT(shipment.id)')->getQuery()->getSingleScalarResult();
         $paginator = new Paginator(function (?int $offset, ?int $limit) use ($qb) {
-            return $qb->getQuery()->getResult();
+            return $qb
+                ->setFirstResult($offset)
+                ->setMaxResults($limit)
+                ->getQuery()
+                ->getResult();
         }, false, $cb);
 
         return $paginator->auto(new Argument(['first' => $first, 'after' => $after]), $total);

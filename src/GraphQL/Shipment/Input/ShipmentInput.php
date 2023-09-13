@@ -28,6 +28,13 @@ abstract class ShipmentInput
     #[GQL\Field()]
     public array $items;
 
+    #[GQL\Field(type: 'DateTimeImmutable')]
+    public ?\DateTimeInterface $pickupAt = null;
+
+    
+    #[GQL\Field(type: 'DateTimeImmutable')]
+    public ?\DateTimeInterface $deliveryAt = null;
+
     #[GQL\Field()]
-    public ?ShipmentBugetInput $budget;
+    public ?ShipmentBugetInput $budget = null;
 }

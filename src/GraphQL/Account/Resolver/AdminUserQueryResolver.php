@@ -1,13 +1,15 @@
 <?php
 
-namespace App\GraphQL\Account\Query;
+namespace App\GraphQL\Account\Resolver;
 
 
 use App\Entity\Account\User;
+use App\GraphQL\Account\Input\UserCreationInput;
 use App\GraphQL\Account\Type\UserConnection;
 use App\GraphQL\Account\Type\UserEdge;
 use App\Repository\Account\UserRepository;
 use App\Util\Doctrine\QueryBuilderHelper;
+use Doctrine\ORM\EntityManagerInterface;
 use Overblog\GraphQLBundle\Annotation as GQL;
 use Overblog\GraphQLBundle\Annotation\Query;
 use Overblog\GraphQLBundle\Definition\Argument;
@@ -19,11 +21,15 @@ use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Uid\Ulid;
 
 
-#[GQL\Provider()]
-class UserQueryResolver
+#[GQL\Provider(
+    targetQueryTypes: ['AdminQuery'],
+    targetMutationTypes: ['AdminMutation'],
+)]
+class AdminUserQueryResolver
 {
 
     public function __construct(
+        private EntityManagerInterface $entityManager,
         private UserRepository $userRepository,
         private Security $security,
     ) {
@@ -32,8 +38,8 @@ class UserQueryResolver
 
 
     #[Query(name: "get_current_user",)]
-    public function getCurrentUser(
-    ): User {
+    public function getCurrentUser(): User
+    {
 
         $user = $this->security->getUser();
         if (!($user instanceof User)) {
@@ -94,9 +100,32 @@ class UserQueryResolver
 
         $total = fn () => (int) (clone $qb)->select('COUNT(user.id)')->getQuery()->getSingleScalarResult();
         $paginator = new Paginator(function (?int $offset, ?int $limit) use ($qb) {
-            return $qb->getQuery()->getResult();
+            return $qb
+                ->setFirstResult($offset)
+                ->setMaxResults($limit)
+                ->getQuery()
+                ->getResult();
         }, false, $cb);
 
         return $paginator->auto(new Argument(['first' => $first, 'after' => $after]), $total);
+    }
+
+
+    #[GQL\Mutation()]
+    public function createNewUser(UserCreationInput $input): User
+    {
+
+        $user = $this->security->getUser();
+        if (!($user instanceof User)) {
+            throw new UserError("Permission Denied: You may not perform this operation");
+        }
+
+        $user = new User();
+        $input->build($user);
+
+        $this->entityManager->persist($user);
+        $this->entityManager->flush();
+
+        return $user;
     }
 }

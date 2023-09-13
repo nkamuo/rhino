@@ -1,13 +1,18 @@
 <?php
 
-namespace App\GraphQL\Catalog\Query;
+namespace App\GraphQL\Catalog\Resolver;
 
-
+use App\Entity\Account\User;
 use App\Entity\Catalog\Product;
+use App\Entity\Catalog\UserProduct;
+use App\GraphQL\Catalog\Input\AdminProductCreationInput;
 use App\GraphQL\Catalog\Type\ProductConnection;
 use App\GraphQL\Catalog\Type\ProductEdge;
+use App\Repository\Account\UserRepository;
 use App\Repository\Catalog\ProductRepository;
+use App\Repository\Catalog\UserProductRepository;
 use App\Util\Doctrine\QueryBuilderHelper;
+use Doctrine\ORM\EntityManagerInterface;
 use Overblog\GraphQLBundle\Annotation as GQL;
 use Overblog\GraphQLBundle\Annotation\Query;
 use Overblog\GraphQLBundle\Definition\Argument;
@@ -15,16 +20,21 @@ use Overblog\GraphQLBundle\Error\UserError;
 use Overblog\GraphQLBundle\Relay\Connection\ConnectionBuilder;
 use Overblog\GraphQLBundle\Relay\Connection\PageInfoInterface;
 use Overblog\GraphQLBundle\Relay\Connection\Paginator;
+use Symfony\Bridge\Doctrine\Types\UlidType;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Uid\Ulid;
 
 
-#[GQL\Provider()]
-class ProductQueryResolver
+#[GQL\Provider(
+    targetQueryTypes: ['AdminQuery']
+)]
+class AdminProductResolver
 {
 
     public function __construct(
-        private ProductRepository $productRepository,
+        private UserProductRepository $productRepository,
+        private EntityManagerInterface $entityManager,
+        private UserRepository $userRepository,
         private Security $security,
     ) {
     }
@@ -53,19 +63,17 @@ class ProductQueryResolver
             );
         }
 
-
-
         return $product;
     }
 
     #[GQL\Query(name: "get_product_list")]
+    // #[GQL\Access("isGranted('ROLE_USER')")]
     public function getProductConnection(
         ?int $first,
         ?String $after,
         ?String $filter,
         ?String $sort,
     ): ProductConnection {
-
 
         $cb = new ConnectionBuilder(
             null,
@@ -74,13 +82,47 @@ class ProductQueryResolver
         );
 
         $qb = $this->productRepository->createQueryBuilder('product');
+
         QueryBuilderHelper::applyCriteria($qb, $filter, 'product');
 
         $total = fn () => (int) (clone $qb)->select('COUNT(product.id)')->getQuery()->getSingleScalarResult();
         $paginator = new Paginator(function (?int $offset, ?int $limit) use ($qb) {
-            return $qb->getQuery()->getResult();
+            return $qb
+                ->setFirstResult($offset)
+                ->setMaxResults($limit)
+                ->getQuery()
+                ->getResult();
         }, false, $cb);
 
         return $paginator->auto(new Argument(['first' => $first, 'after' => $after]), $total);
+    }
+
+
+
+    
+    #[GQL\Mutation()]
+    public function createNewProduct(AdminProductCreationInput $input): Product
+    {
+        $user = $this->getUserById($input->userId);
+
+        $product = new UserProduct();
+        $input->build($product);
+        $product->setOwner($user);
+
+        $this->entityManager->persist($product);
+        $this->entityManager->flush();
+
+        return $product;
+    }
+
+
+
+    public function getUserById(Ulid $id): User
+    {
+        $user = $this->userRepository->find($id);
+        if (!$user) {
+            throw new UserError("Could not find user with [id: {$id}]");
+        }
+        return $user;
     }
 }

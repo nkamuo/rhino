@@ -3,6 +3,7 @@
 namespace App\Entity\Shipment;
 
 use App\Entity\Account\User;
+use App\Entity\Addressing\Routing\Route;
 use App\Entity\Addressing\UserAddress;
 use App\Repository\Shipment\ShipmentRepository;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -44,11 +45,11 @@ class Shipment
     #[ORM\ManyToOne(cascade: ['persist',])]
     private ?UserAddress $destinationAddress = null;
 
-    #[GQL\Field(type:'[ShipmentItem!]!')]
+    #[GQL\Field(type: '[ShipmentItem!]!')]
     #[ORM\OneToMany(mappedBy: 'shipment', targetEntity: ShipmentItem::class, cascade: ['persist', 'remove'], orphanRemoval: true)]
     private Collection $items;
 
-    #[GQL\Field(type:'[ShipmentDriverBid!]!')]
+    #[GQL\Field(type: '[ShipmentDriverBid!]!')]
     #[ORM\OneToMany(mappedBy: 'shipment', targetEntity: ShipmentDriverBid::class, cascade: ['persist', 'remove'], orphanRemoval: true)]
     private Collection $bids;
 
@@ -64,6 +65,29 @@ class Shipment
     #[ORM\Column()]
     private ?\DateTimeImmutable $createdAt = null;
 
+    #[GQL\Field()]
+    #[ORM\ManyToOne(cascade: ['persist',])]     // AVOID REMOVE CUS MORE THAN ONE SHIPMENTS CAN USE THE SAME ROUTE
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Route $route = null;
+
+    #[GQL\Field()]
+    #[ORM\Column(
+        length: 64,
+        enumType: ShipmentStatus::class,
+        options: [
+            'default' => ShipmentStatus::PENDING,
+        ]
+    )]
+    private ?ShipmentStatus $status = ShipmentStatus::PENDING;
+
+    #[GQL\Field(type: "DateTime")]
+    #[ORM\Column(nullable: true)]
+    private ?\DateTimeImmutable $pickupAt = null;
+
+    #[GQL\Field(type: "DateTime")]
+    #[ORM\Column(nullable: true)]
+    private ?\DateTimeImmutable $deliveryAt = null;
+
 
     public function __construct(?Ulid $id = null)
     {
@@ -78,7 +102,7 @@ class Shipment
         return $this->id;
     }
 
-    
+
     public function getType(): ?ShipmentType
     {
         return $this->type;
@@ -235,4 +259,51 @@ class Shipment
         return $this;
     }
 
+    public function getRoute(): ?Route
+    {
+        return $this->route;
+    }
+
+    public function setRoute(?Route $route): static
+    {
+        $this->route = $route;
+
+        return $this;
+    }
+
+    public function getStatus(): ?ShipmentStatus
+    {
+        return $this->status;
+    }
+
+    public function setStatus(ShipmentStatus $status): static
+    {
+        $this->status = $status;
+
+        return $this;
+    }
+
+    public function getPickupAt(): ?\DateTimeImmutable
+    {
+        return $this->pickupAt;
+    }
+
+    public function setPickupAt(?\DateTimeImmutable $pickupAt): static
+    {
+        $this->pickupAt = $pickupAt;
+
+        return $this;
+    }
+
+    public function getDeliveryAt(): ?\DateTimeImmutable
+    {
+        return $this->deliveryAt;
+    }
+
+    public function setDeliveryAt(?\DateTimeImmutable $deliveryAt): static
+    {
+        $this->deliveryAt = $deliveryAt;
+
+        return $this;
+    }
 }

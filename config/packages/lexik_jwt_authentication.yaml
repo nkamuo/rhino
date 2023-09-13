@@ -4,4 +4,4 @@ lexik_jwt_authentication:
     pass_phrase: '%env(JWT_PASSPHRASE)%'
     allow_no_expiration: true
     # token_ttl: 0
-    # token_ttl: 30000000
+    token_ttl: 30000000

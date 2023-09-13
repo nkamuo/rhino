@@ -36,6 +36,10 @@ class Product
     #[ORM\OneToOne(cascade: ['persist', 'remove'])]
     private ?ProductDimension $dimension = null;
 
+    #[GQL\Field()]
+    #[ORM\Column(options:['default' => 0])]
+    private ?int $weight = null;
+
     public function getId(): ?Ulid
     {
         return $this->id;
@@ -85,6 +89,18 @@ class Product
     public function setDimension(?ProductDimension $dimension): static
     {
         $this->dimension = $dimension;
+
+        return $this;
+    }
+
+    public function getWeight(): ?int
+    {
+        return $this->weight;
+    }
+
+    public function setWeight(int $weight): static
+    {
+        $this->weight = $weight;
 
         return $this;
     }

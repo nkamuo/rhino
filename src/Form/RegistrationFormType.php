@@ -5,6 +5,7 @@ namespace App\Form;
 use App\Entity\Account\User;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\TelType;
@@ -22,12 +23,12 @@ class RegistrationFormType extends AbstractType
         $builder
             ->add('firstName')
             ->add('lastName')
-            ->add('phone', TelType::class,[
+            ->add('phone', TelType::class, [
                 'constraints' => [
-                //    new Tel()
+                    //    new Tel()
                 ],
             ])
-            ->add('email',EmailType::class,[
+            ->add('email', EmailType::class, [
                 'constraints' => [
                     new NotBlank([
                         'message' => 'Please enter an email address',
@@ -59,6 +60,14 @@ class RegistrationFormType extends AbstractType
                         'max' => 4096,
                     ]),
                 ],
+            ])
+            ->add('userType', ChoiceType::class, [
+                'mapped' => false,
+                'choices' => [
+                    'Shipper' => 'SHIPPER',
+                    'Trucker' => 'TRUCKER',
+                ],
+                'constraints' => []
             ]);
     }
 

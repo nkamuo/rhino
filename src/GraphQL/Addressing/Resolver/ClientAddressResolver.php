@@ -1,13 +1,17 @@
 <?php
 
-namespace App\GraphQL\Addressing\Query;
+namespace App\GraphQL\Addressing\Resolver;
 
-
+use App\Entity\Account\User;
 use App\Entity\Addressing\Address;
+use App\Entity\Addressing\UserAddress;
+use App\GraphQL\Addressing\Input\AddressCreationInput;
 use App\GraphQL\Addressing\Type\AddressConnection;
 use App\GraphQL\Addressing\Type\AddressEdge;
 use App\Repository\Addressing\AddressRepository;
+use App\Repository\Addressing\UserAddressRepository;
 use App\Util\Doctrine\QueryBuilderHelper;
+use Doctrine\ORM\EntityManagerInterface;
 use Overblog\GraphQLBundle\Annotation as GQL;
 use Overblog\GraphQLBundle\Annotation\Query;
 use Overblog\GraphQLBundle\Definition\Argument;
@@ -15,16 +19,21 @@ use Overblog\GraphQLBundle\Error\UserError;
 use Overblog\GraphQLBundle\Relay\Connection\ConnectionBuilder;
 use Overblog\GraphQLBundle\Relay\Connection\PageInfoInterface;
 use Overblog\GraphQLBundle\Relay\Connection\Paginator;
+use Symfony\Bridge\Doctrine\Types\UlidType;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Uid\Ulid;
 
 
-#[GQL\Provider()]
-class AddressQueryResolver
+#[GQL\Provider(
+    targetQueryTypes: ['ClientQuery'],
+    targetMutationTypes: ['ClientMutation'],
+)]
+class ClientAddressResolver
 {
 
     public function __construct(
-        private AddressRepository $addressRepository,
+        private UserAddressRepository $addressRepository,
+        private EntityManagerInterface $entityManager,
         private Security $security,
     ) {
     }
@@ -59,6 +68,7 @@ class AddressQueryResolver
     }
 
     #[GQL\Query(name: "get_address_list")]
+    #[GQL\Access("isGranted('ROLE_USER')")]
     public function getAddressConnection(
         ?int $first,
         ?String $after,
@@ -66,6 +76,10 @@ class AddressQueryResolver
         ?String $sort,
     ): AddressConnection {
 
+        $user = $this->security->getUser();
+        if (!($user instanceof User)) {
+            throw new UserError("Permission Denied: You may not perform this operation");
+        }
 
         $cb = new ConnectionBuilder(
             null,
@@ -74,13 +88,44 @@ class AddressQueryResolver
         );
 
         $qb = $this->addressRepository->createQueryBuilder('address');
+
+
+        $qb
+            ->innerJoin('address.owner', 'owner')
+            ->andWhere("owner.id = :owner")
+            ->setParameter("owner", $user->getId(), UlidType::NAME);
+
         QueryBuilderHelper::applyCriteria($qb, $filter, 'address');
 
         $total = fn () => (int) (clone $qb)->select('COUNT(address.id)')->getQuery()->getSingleScalarResult();
         $paginator = new Paginator(function (?int $offset, ?int $limit) use ($qb) {
-            return $qb->getQuery()->getResult();
+            return $qb
+                ->setFirstResult($offset)
+                ->setMaxResults($limit)
+                ->getQuery()
+                ->getResult();
         }, false, $cb);
 
         return $paginator->auto(new Argument(['first' => $first, 'after' => $after]), $total);
+    }
+
+
+
+    #[GQL\Mutation()]
+    public function createNewAddress(AddressCreationInput $input): Address
+    {
+
+        $user = $this->security->getUser();
+        if (!($user instanceof User)) {
+            throw new UserError("Permission Denied: You may not perform this operation");
+        }
+        $address = new UserAddress();
+        $input->build($address);
+
+        $address->setOwner($user);
+        $this->entityManager->persist($address);
+        $this->entityManager->flush();
+
+        return $address;
     }
 }

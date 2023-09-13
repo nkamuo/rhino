@@ -1,0 +1,449 @@
+{
+    "bounds": {
+        "northeast": {
+            "lat": 6.420194299999999,
+            "lng": 7.5356599
+        },
+        "southwest": {
+            "lat": 6.0246011,
+            "lng": 7.028782499999999
+        }
+    },
+    "copyrights": "Map data \u00a92023",
+    "legs": [
+        {
+            "distance": {
+                "text": "94.0 km",
+                "value": 93992
+            },
+            "duration": {
+                "text": "2 hours 2 mins",
+                "value": 7326
+            },
+            "end_address": "express road, Km3 Enugu-Port Harcourt Rd, Ugwuaji 400102, Enugu, Nigeria",
+            "end_location": {
+                "lat": 6.420194299999999,
+                "lng": 7.5356599
+            },
+            "start_address": "26 Oko Road Aguata, 422111, Ekwulobia, Anambra, Nigeria",
+            "start_location": {
+                "lat": 6.0246011,
+                "lng": 7.084047399999999
+            },
+            "steps": [
+                {
+                    "distance": {
+                        "text": "1.6 km",
+                        "value": 1563
+                    },
+                    "duration": {
+                        "text": "3 mins",
+                        "value": 180
+                    },
+                    "end_location": {
+                        "lat": 6.037393499999999,
+                        "lng": 7.0878011
+                    },
+                    "html_instructions": "Head <b>northeast<\/b> on <b>Nnobi-Ekwulobia Rd<\/b>\/<wbr\/><b>Nnobi-Enugu Umunze Rd<\/b><div style=\"font-size:0.9em\">Continue to follow Nnobi-Enugu Umunze Rd<\/div><div style=\"font-size:0.9em\">Pass by the gas station (on the left)<\/div>",
+                    "polyline": {
+                        "points": "wtwc@irfj@_BuAu@q@eA}@CCc@Ye@S[Ma@Qe@S}Ao@w@Ws@MgAKkAKmAOeBMKAa@Ac@A[BYF_@L]P[Pe@T_Ad@g@RWHK@M?]?WAUEECk@S_Ac@u@_@EC]Om@Um@Oo@QKCyAa@_@KcCi@i@OwBi@wBi@ICaAUi@O_Ba@]M"
+                    },
+                    "start_location": {
+                        "lat": 6.0246011,
+                        "lng": 7.084047399999999
+                    },
+                    "travel_mode": "DRIVING"
+                },
+                {
+                    "distance": {
+                        "text": "2.5 km",
+                        "value": 2472
+                    },
+                    "duration": {
+                        "text": "4 mins",
+                        "value": 263
+                    },
+                    "end_location": {
+                        "lat": 6.042864300000001,
+                        "lng": 7.067967299999999
+                    },
+                    "html_instructions": "At the roundabout, take the <b>2nd<\/b> exit onto <b>Oko - Nanka Rd<\/b><div style=\"font-size:0.9em\">Pass by Oko Roundabout (on the left)<\/div>",
+                    "maneuver": "roundabout-right",
+                    "polyline": {
+                        "points": "udzc@wigj@A??AA??AA??AA?A?A?A?A?A?A??@A?A@A@?@A??@?@?@?@?@?@?@@@?@@??@@?BHBJFJDHDNL^\\~@v@dC^jA`@zAFNJb@F\\Fb@BNB^@J@Z?R@v@?HEt@AR[zA?@i@vBYfAQn@I\\Qj@WhAEJAFWvAQbAALQ`AG`@G`@AJANAV?NB`@@BH|@LdADXFVLb@DRBFBJBR@T?j@?HCj@Ex@Et@Iv@Ov@CFENw@nAYd@MPQXEFU`@Sd@GTCJIZI^Ih@O`AG`@Mp@Gb@Mj@GPMTY\\a@f@[^A@c@d@i@l@w@|@o@x@CBWZc@h@y@hAMPcAlAo@t@y@dAMNm@r@aAhAcAlAGFCDAB"
+                    },
+                    "start_location": {
+                        "lat": 6.037393499999999,
+                        "lng": 7.0878011
+                    },
+                    "travel_mode": "DRIVING"
+                },
+                {
+                    "distance": {
+                        "text": "12.1 km",
+                        "value": 12072
+                    },
+                    "duration": {
+                        "text": "16 mins",
+                        "value": 939
+                    },
+                    "end_location": {
+                        "lat": 6.1385451,
+                        "lng": 7.034657699999999
+                    },
+                    "html_instructions": "Slight <b>right<\/b> onto <b>Amobia-Agulezechuku Rd<\/b>\/<wbr\/><b>Awka - Okigwe Rd<\/b>\/<wbr\/><b>Ekwulobia - Awka Rd<\/b>\/<wbr\/><b>Ozubulu - Okigwi Road<\/b><div style=\"font-size:0.9em\">Continue to follow Amobia-Agulezechuku Rd\/<wbr\/>Awka - Okigwe Rd\/<wbr\/>Ekwulobia - Awka Rd<\/div><div style=\"font-size:0.9em\">Pass by the church (on the right)<\/div>",
+                    "maneuver": "turn-slight-right",
+                    "polyline": {
+                        "points": "{f{c@ymcj@aAZiA\\e@NUHuA\\cBZu@Ne@H}@PoBVeBVgEl@mAPm@Lm@Ry@^]N}CrAi@XcBr@}BbAm@Vo@XQHoAd@oAb@w@Zc@Ti@ZCBgAj@c@TOHm@ZUL_Ad@yBjA_B~@s@ZMFSFa@Hu@PQBk@JmATcAN{AZuBj@_B`@A?{Af@oAb@qBr@q@Vq@T[JyBz@yAj@SHkAd@UJIBmBx@mAd@gAf@_A`@s@XoC`AC@qC`A_A^_FfBw@XoAb@uBr@A@q@ToAb@aDjAsA`@aA^o@Zg@ZwFnEcBpA{CdCA@}@v@OLm@h@c@^a@d@Yd@SZA@{@|A[n@iAxBaBfDCB[j@qAtBWZWZCBs@j@kAt@yAr@o@TcAXeBh@aCr@aAVuL~Cm@N}Bn@eBf@[HeEfAeBb@}A`@E@sAVWDaBX}ARoAN}@HYDSD{@Pg@JmAXiBb@a@Jg@LeAViCp@_@JsDz@?@E@A?uFlAQDuBd@c@JgJjBoAT{@NkATgCj@mEbAIBcCf@cBb@}@Ri@H_@Fq@HG?o@DgABm@FiBJo@Fw@Js@P_AVC@{C|@KBq@RsC~@gErAeErAeCx@_@LA?gAh@q@`@QN_At@_@`@_@`@_AbA_@^sAvAA@WX_@b@g@h@eBjBm@b@i@^{@\\C@e@NIBuDhA{DjAkA`@k@VYJ[Fk@L_@NWNYR?@]\\STIHa@b@IJmAtAKJsB|BEDCD}AbBc@b@i@f@_A~@i@Vk@TA?a@JiBf@}Cv@k@Ne@LQDg@HSBo@He@AYC]GGAYK[S_@Yq@k@_Ao@}@w@MKMKeCwBMIYW[WqAgAyAaAc@WUOs@YqAg@CAMCgBm@AAa@M]KiC{@o@SMGEAu@YeB{@{@i@UK}@i@}@g@{@c@s@a@iCwAg@S[Gu@GIAA?g@COAgCKi@CYA]?Q?W?O?SBy@Du@F{AL_@Bc@Bm@Dc@B{AFgBFcGVS@M?]C"
+                    },
+                    "start_location": {
+                        "lat": 6.042864300000001,
+                        "lng": 7.067967299999999
+                    },
+                    "travel_mode": "DRIVING"
+                },
+                {
+                    "distance": {
+                        "text": "7.5 km",
+                        "value": 7497
+                    },
+                    "duration": {
+                        "text": "10 mins",
+                        "value": 625
+                    },
+                    "end_location": {
+                        "lat": 6.194409599999999,
+                        "lng": 7.0556686
+                    },
+                    "html_instructions": "At the roundabout, take the <b>2nd<\/b> exit onto <b>Amobia-Agulezechuku Rd<\/b><div style=\"font-size:0.9em\">Pass by Pac Concepts (on the right)<\/div>",
+                    "maneuver": "roundabout-right",
+                    "polyline": {
+                        "points": "}|md@s}|i@?AA??AA?A??AA?A?A?A?A?A?A??@A?A??@A??@A?e@KSB{AEaAIiCU{CYqEe@UC}D[_BKkDYiCSaHo@kE_@kD[c@EkGi@CAaGg@cAMa@Ea@G}Ac@kCs@e@IA?a@EkAFYBWHWHSF[JE@u@Vc@JI?]?E?[Gm@Su@_@eBgAo@_@qBwA[UAAsA_A]U_BgAoAg@YIUEcAC[?C@m@DkANcA@{@O}@]{@]u@_@kCqA_BcA_Am@mCiB[UgAk@eAi@sAo@oB_A{CoA]KIAEAG?_@?WFe@L_A`@eAb@i@XqBbAEBGBkAd@eBp@yA^iBXOBy@N_@Dw@LaC\\yFz@k@Di@@a@CaCKGAA?eCSoB]aB[w@Ww@e@kCgC_A}@eD}CIIw@u@_AaAs@eAy@aAYYYQe@Us@Q_AUc@Si@a@cAw@CAqByAwBmAYKi@M{@Oa@Eq@GqAEU?eAKiAWcAa@aBm@WO]U[]MWI[GY[eBG[e@uB[mASg@a@o@m@}@Ma@EQAM?M@KJy@Ly@JiALuA@QBg@?i@GwAC]K_@i@oAm@_Ay@cAyBaC}@eAkB_CCAe@[m@Y]ISCSCOEg@C_@Ac@AC?kA?{@?eDB]B[F[HUHe@Z{@l@o@d@MFa@H"
+                    },
+                    "start_location": {
+                        "lat": 6.1385451,
+                        "lng": 7.034657699999999
+                    },
+                    "travel_mode": "DRIVING"
+                },
+                {
+                    "distance": {
+                        "text": "0.5 km",
+                        "value": 484
+                    },
+                    "duration": {
+                        "text": "2 mins",
+                        "value": 96
+                    },
+                    "end_location": {
+                        "lat": 6.1972017,
+                        "lng": 7.052445899999999
+                    },
+                    "html_instructions": "At the roundabout, take the <b>2nd<\/b> exit onto <b>Amobia-Agulezechuku Rd<\/b>\/<wbr\/><b>Nkpor-Ukukwa Rd<\/b>\/<wbr\/><b>Old Onitsha-Enugu Rd<\/b>\/<wbr\/><b>Zik Ave<\/b><div style=\"font-size:0.9em\">Continue to follow Nkpor-Ukukwa Rd\/<wbr\/>Old Onitsha-Enugu Rd\/<wbr\/>Zik Ave<\/div><div style=\"font-size:0.9em\">Pass by Amawbia Roundabout (on the left)<\/div>",
+                    "maneuver": "roundabout-right",
+                    "polyline": {
+                        "points": "azxd@}`aj@A?AAA?A?A?A?A??@A?A??@A?A@?@A??@?@A??@?@?@?@KVGHa@b@}ApAg@`@KFy@p@q@f@c@`@[`@QXYd@iAzBCF]x@EHAH"
+                    },
+                    "start_location": {
+                        "lat": 6.194409599999999,
+                        "lng": 7.0556686
+                    },
+                    "travel_mode": "DRIVING"
+                },
+                {
+                    "distance": {
+                        "text": "1.7 km",
+                        "value": 1661
+                    },
+                    "duration": {
+                        "text": "4 mins",
+                        "value": 228
+                    },
+                    "end_location": {
+                        "lat": 6.208031399999999,
+                        "lng": 7.042415
+                    },
+                    "html_instructions": "Turn <b>right<\/b> onto <b>Amobia-Nogu Rd<\/b>\/<wbr\/><b>Asaba-Onisha-Enugu Rd<\/b>\/<wbr\/><b>Nta Awka Road<\/b><div style=\"font-size:0.9em\">Pass by Winner Arts Int'l (on the right)<\/div>",
+                    "maneuver": "turn-right",
+                    "polyline": {
+                        "points": "okyd@yl`j@G?A?C?GDC@aD|DUVWZYZGHQNGHw@h@e@RULkAj@WLgAl@SLs@^c@Rc@RkB|@w@`@aBz@c@Tu@b@w@`@c@Rm@ZA@UNUTA@QP[`@_@h@k@bAQ\\qAvB{@tAq@|@w@`AQVe@j@WZm@t@gApAWX}AbBk@l@EDo@r@YX_@^QRWT"
+                    },
+                    "start_location": {
+                        "lat": 6.1972017,
+                        "lng": 7.052445899999999
+                    },
+                    "travel_mode": "DRIVING"
+                },
+                {
+                    "distance": {
+                        "text": "0.2 km",
+                        "value": 228
+                    },
+                    "duration": {
+                        "text": "1 min",
+                        "value": 35
+                    },
+                    "end_location": {
+                        "lat": 6.2096271,
+                        "lng": 7.0437033
+                    },
+                    "html_instructions": "Turn <b>right<\/b><div style=\"font-size:0.9em\">Pass by Petroleum Delaers Association Of Nigeria Pedan (on the right)<\/div>",
+                    "maneuver": "turn-right",
+                    "polyline": {
+                        "points": "eo{d@cn~i@qAaAw@m@[U[UoByAMI"
+                    },
+                    "start_location": {
+                        "lat": 6.208031399999999,
+                        "lng": 7.042415
+                    },
+                    "travel_mode": "DRIVING"
+                },
+                {
+                    "distance": {
+                        "text": "7.7 km",
+                        "value": 7667
+                    },
+                    "duration": {
+                        "text": "8 mins",
+                        "value": 475
+                    },
+                    "end_location": {
+                        "lat": 6.230102,
+                        "lng": 7.1060519
+                    },
+                    "html_instructions": "Take the ramp onto <b>Enugu - Onitsha Expy<\/b>\/<wbr\/><b>A232<\/b><div style=\"font-size:0.9em\">Pass by the bridge (on the left in 2.2 km)<\/div>",
+                    "polyline": {
+                        "points": "ey{d@cv~i@CCICIAI@E?YUyBaB_As@yAkAECk@c@CCi@c@qCyBECWS{@o@i@c@c@[_@[OKKI[WOKGESOa@]EEYUi@c@IGCCMKKKOKSQEECA_AaA}BwCq@aAIQIMIOIMIOGOCCe@cA_@cAEOIU[aAGOCKAECIAEG]g@}BCMAAE[EYIe@AMK}AKkBAk@?E?Q?K@{ADcEBm@BuB@QLoC@c@@_@@c@@c@@i@@a@@a@?A@a@?C@_@CyB?UCi@GgAEWQoA?Em@gDGYMi@e@_B?Ak@gBoAgCu@wAGIm@aA]g@kC{Cu@q@eAy@USi@c@YSmDkC]Wo@i@_@[GEqCsCe@e@SSoA{AcAwAu@aAsB{CoA{BEGc@y@?Ac@y@GMw@iBcAiCACq@uBa@qAEOEOCKCECOaAwDe@_CCMYcBUgBKeAW}CK_CAW?KKgDC}@?WAWK{C?[A[O{CM{D?yAGwAE{D?CEyAM_EYoPAgAK_EI{CM{FM}FCu@?QA]Ac@WkKAe@Ac@Cc@Ac@Ac@Ac@Ac@?OEcBQ{GI{CO_HAOC}BC}@CgCQoEKiAK}AOmA"
+                    },
+                    "start_location": {
+                        "lat": 6.2096271,
+                        "lng": 7.0437033
+                    },
+                    "travel_mode": "DRIVING"
+                },
+                {
+                    "distance": {
+                        "text": "0.1 km",
+                        "value": 102
+                    },
+                    "duration": {
+                        "text": "1 min",
+                        "value": 16
+                    },
+                    "end_location": {
+                        "lat": 6.2291954,
+                        "lng": 7.1061931
+                    },
+                    "html_instructions": "Turn <b>right<\/b> onto <b>Nkpor-Ukukwa Rd<\/b>\/<wbr\/><b>Nnamdi Azikiwe Ave<\/b>\/<wbr\/><b>Zik Ave<\/b><div style=\"font-size:0.9em\">Pass by the gas station (on the right)<\/div>",
+                    "maneuver": "turn-right",
+                    "polyline": {
+                        "points": "cy_e@y{jj@rD["
+                    },
+                    "start_location": {
+                        "lat": 6.230102,
+                        "lng": 7.1060519
+                    },
+                    "travel_mode": "DRIVING"
+                },
+                {
+                    "distance": {
+                        "text": "86 m",
+                        "value": 86
+                    },
+                    "duration": {
+                        "text": "1 min",
+                        "value": 11
+                    },
+                    "end_location": {
+                        "lat": 6.2292874,
+                        "lng": 7.106720699999999
+                    },
+                    "html_instructions": "At the roundabout, take the <b>2nd<\/b> exit",
+                    "maneuver": "roundabout-right",
+                    "polyline": {
+                        "points": "os_e@u|jj@@??@@?@?@@@?@?@?@?@?@?@??A@?@?@A@A@??A?A@??A?A@A?A?A?A?A?A?AA??AAA?AAAA??AA?A??AA?g@eA"
+                    },
+                    "start_location": {
+                        "lat": 6.2291954,
+                        "lng": 7.1061931
+                    },
+                    "travel_mode": "DRIVING"
+                },
+                {
+                    "distance": {
+                        "text": "11.6 km",
+                        "value": 11626
+                    },
+                    "duration": {
+                        "text": "17 mins",
+                        "value": 1034
+                    },
+                    "end_location": {
+                        "lat": 6.2635904,
+                        "lng": 7.1960381
+                    },
+                    "html_instructions": "Continue onto <b>Old Enugu Road<\/b><div style=\"font-size:0.9em\">Pass by abdinigeria (on the left in 450m)<\/div>",
+                    "polyline": {
+                        "points": "at_e@_`kj@ACk@cAsB{DuB_E[o@kBoD}A}CEKuAkCsAiCmCiFYk@IOqDcHYi@}BmEoBwD_AqBsBcEo@oAqAiC{AyCqCuFiBuDy@aBgCcFKS_AkBu@{AaGsLwDuHcAsBkFmKkFuKu@uA[i@cA}AcAsAk@{@sCoEKMcAeBiCuE}CqFmDkG}DmH_DwFsAuCCEKc@}@gEAS]gEIuAOaCEaD@cAB}@`@eEVoCj@kD@G@KHs@JiADqBCcBSmBSmAMi@SaAmC}Gm@{As@eBaBaEa@aAEIc@cA}@oBkA_CaAuBcAkBm@uAo@wAy@gBYc@e@m@WWSSII[e@Uk@[_A]s@CG_@y@Yo@Ok@E]?I?OBS@QHa@J[HUHSXk@Zg@LQf@s@dCqDV[xAoBfCiDLQ~@kAj@s@`@g@VSJGTOlF{Cj@Sr@O`@En@EDA\\EZIPKTQPYLi@@CBa@?YE]Q_Aa@sAEOe@_BQi@Uw@aA}CWm@_@{@GGOW]e@]a@}A{A_@]QSm@i@u@u@SQi@g@y@y@_A_AiAiASQcAaAaA_AcAeAw@w@w@y@WYUU]_@[[cAkAGGmAwA[]q@u@mAuAOS{@cAy@y@CA[[]]cCsB}@w@y@s@e@e@MO]c@]m@Wg@Q_@Uo@Sq@Km@KaAMqAIaAI}@Ei@CYBM?E?gADYF_@VkA@EX{A@[AU?KSaACOAIQoAGe@?_A@oD?_ED_E?u@?Q?}D"
+                    },
+                    "start_location": {
+                        "lat": 6.2292874,
+                        "lng": 7.106720699999999
+                    },
+                    "travel_mode": "DRIVING"
+                },
+                {
+                    "distance": {
+                        "text": "22.8 km",
+                        "value": 22800
+                    },
+                    "duration": {
+                        "text": "28 mins",
+                        "value": 1659
+                    },
+                    "end_location": {
+                        "lat": 6.3042465,
+                        "lng": 7.3892876
+                    },
+                    "html_instructions": "Continue onto <b>Udi-Ngwo Rd<\/b><div style=\"font-size:0.9em\">Pass by Aguabosi Health Clinic (on the right in 1.3 km)<\/div>",
+                    "polyline": {
+                        "points": "mjfe@gn|j@?i@@_CJ}AVyAd@yA|@sB`@w@^s@lBgDn@gADGr@kAdAmB^kA@WBSAGAgA?}BAaCCmAIu@E]WyBKy@WsBIgA@}@PkBPs@d@uAx@yAdAwAx@aABEr@cARe@b@{Al@qB@Ax@qBbBaDn@yANs@Ai@Ge@[u@[g@g@g@c@c@USQYSe@Ok@Ic@Cs@@c@DoBDoAFeC@SLaDRsEFeCHoCDgAFyALmDPcCBc@?Ab@}DfAuJh@}ELeAj@oE?Cb@mDHkAVgDXaFB]XiJLiCLqBBa@D}ABs@@S?y@?aBFwD?Q?oC?c@@uDB{I@wA@{A?kCBoB@qA@m@?_@?KC{@CaAI}AEmACc@KyBG}AMoCEq@UmFIuAIeBGiA?AIgBImBEu@IkBIeBCi@EgAKwBIwBIgAGeAKcBCm@QoCEq@OwCIiAQqCMeDC[MmBEo@?KMuBO_CE]QyBEyA?E?u@FWLq@l@gBJ]^gA^gABMLi@Fq@?A@_AAuB?IGqCGk@Iy@CWEg@AQIcB?u@BsBHs@Hy@HmA@ICe@AQGWSaACMOa@m@aBWs@e@{A_A}Cg@uBIa@Sy@EQGWyAcG_AgDoAuDSi@Uo@qAiDo@aB_@aAQ]_@w@EIm@cASSUSy@g@]QaAg@WKECcBw@uAs@cAg@QK_Ae@c@WoBiAyA}@g@]mBkA_@WmBoAaBwAc@c@[a@KOKOUa@KUKYSo@Kc@YcAm@}BK_@gAkEaAyDe@cBSw@o@aCMc@cAyDy@_DAGm@{Bi@oBk@}Bs@sCq@kCqCmKoByHSu@a@yAwBgImAgE}BiI_GaTMc@qBeH]mAg@kB_DeLaAsDg@mBu@}C[sA[}AWqAE[qAeGo@mDo@yCEWm@qCEQmA}Fo@iCEU}@mDQy@iAaFCGc@wB_@qBKk@Y_BYyAq@oD_BiJgAyGcAkFWeBgAkGACcB{Ja@cCy@}Eq@sDIe@k@gDYsBw@qE_BoJaAgF]qBKm@oAiHi@{Cu@sEWsAYcBm@gDm@sDq@yDqAoHUyAACQwAqAqHaAiFQaAWkAYcAmAuCe@eAc@}@cAeCaAaCsC_HO[kA{CkB}DeAgCqAmDyAiDkAaDgAwCuAkDc@kACGc@mAc@iACGa@iAg@oAa@kACGgA{CqAwDcA_DWgAe@eBKc@y@{CiBaISaAqByIkAsFCO_@iBq@mDSeA{@mE]kBkAiGe@cCqAmHi@wCSy@Sq@Si@M_@MY"
+                    },
+                    "start_location": {
+                        "lat": 6.2635904,
+                        "lng": 7.1960381
+                    },
+                    "travel_mode": "DRIVING"
+                },
+                {
+                    "distance": {
+                        "text": "7 m",
+                        "value": 7
+                    },
+                    "duration": {
+                        "text": "1 min",
+                        "value": 1
+                    },
+                    "end_location": {
+                        "lat": 6.3042167,
+                        "lng": 7.389339499999999
+                    },
+                    "html_instructions": "Turn <b>right<\/b> toward <b>UZO ONYENKUZI<\/b>",
+                    "maneuver": "turn-right",
+                    "polyline": {
+                        "points": "qhne@afbl@DI"
+                    },
+                    "start_location": {
+                        "lat": 6.3042465,
+                        "lng": 7.3892876
+                    },
+                    "travel_mode": "DRIVING"
+                },
+                {
+                    "distance": {
+                        "text": "2.9 km",
+                        "value": 2905
+                    },
+                    "duration": {
+                        "text": "4 mins",
+                        "value": 234
+                    },
+                    "end_location": {
+                        "lat": 6.3121904,
+                        "lng": 7.4134242
+                    },
+                    "html_instructions": "Turn <b>left<\/b> onto <b>UZO ONYENKUZI<\/b><div style=\"font-size:0.9em\">Pass by Community Primary School (on the right in 2 km)<\/div>",
+                    "maneuver": "turn-left",
+                    "polyline": {
+                        "points": "khne@kfbl@_@oD?GEYc@}Cm@_DaAqF{@_Fi@gCiAmFuAqGk@}CK}@KaA[gBIc@_@uBM{@UuAAIi@aDUsAQoAYcCKiAOgBGq@Y{DGq@KeAAMIcBEaAKw@E[C_@CaAAeAAO?AA{@CqAAuACW?CCe@S{@Yg@QU_@SiAg@mAe@qAm@u@c@g@[a@WICk@c@a@a@c@i@Wi@K[EMWw@CIACAC[{@_@o@"
+                    },
+                    "start_location": {
+                        "lat": 6.3042167,
+                        "lng": 7.389339499999999
+                    },
+                    "travel_mode": "DRIVING"
+                },
+                {
+                    "distance": {
+                        "text": "0.6 km",
+                        "value": 617
+                    },
+                    "duration": {
+                        "text": "1 min",
+                        "value": 85
+                    },
+                    "end_location": {
+                        "lat": 6.316940799999999,
+                        "lng": 7.4142068
+                    },
+                    "html_instructions": "Turn <b>left<\/b> at the church<div style=\"font-size:0.9em\">Pass by Hill Side Primary School (on the right)<\/div>",
+                    "maneuver": "turn-left",
+                    "polyline": {
+                        "points": "ezoe@{|fl@i@Dw@HG?u@H{@P}@Tm@Jq@FW?KCIEOCIESSWc@Oo@Ko@Oe@IOGIMIME[GE?a@Ac@?O?u@BeAF]Bc@DA?S?UAKA"
+                    },
+                    "start_location": {
+                        "lat": 6.3121904,
+                        "lng": 7.4134242
+                    },
+                    "travel_mode": "DRIVING"
+                },
+                {
+                    "distance": {
+                        "text": "8.3 km",
+                        "value": 8280
+                    },
+                    "duration": {
+                        "text": "10 mins",
+                        "value": 616
+                    },
+                    "end_location": {
+                        "lat": 6.3159921,
+                        "lng": 7.477352299999999
+                    },
+                    "html_instructions": "Turn <b>right<\/b> onto <b>Mbalaze-Udi Rd<\/b>\/<wbr\/><b>Udi Road<\/b><div style=\"font-size:0.9em\">Pass by the gas station (on the right in 8.3 km)<\/div>",
+                    "maneuver": "turn-right",
+                    "polyline": {
+                        "points": "{wpe@yagl@AQCsAKcCEu@MeBQgBOaAK}@EUUeBMm@Mc@Se@Q_@{@gA}@w@y@y@A?sAmAm@c@a@UiAc@y@WEAkAU}@QiAWUIUIm@[m@_@}@o@kAgAmAuAiAmAs@}@QUMQKQS_@[u@]aA[_AiAgC{@sBs@gB]}@]o@_@u@Ui@Kc@EQAQ?UBW?CDSL[NURU^[`Au@dA{@b@a@JKNOBIDK@K?I?I?GCIGK]m@IKe@o@U]Sk@Oc@Mg@AU@K@OBUB}@?WKgAOy@Uo@Uq@EWAUBK@IFOFKFGFGHCHCF?H?PDXHVLVJTJJBF@F?FADAHEBABE@E?C?E?CAEAEGIMIWOg@e@SYa@m@Ya@KOe@_AKc@Oy@Kc@Og@]}@Ww@Ia@Ou@Ko@Ck@@Y?GBy@JoA@QDY@Q?GFw@By@BaABg@LyABq@@IBkA@u@?m@@u@@o@Cc@?CEi@Ea@Ca@@a@F[Hc@Ri@Ra@LSXg@p@_An@k@n@a@NKz@s@BG`@i@v@w@x@_Al@m@\\a@Z_@LSHMVc@Vq@Rs@Z}@Pm@@EP{@Dq@Hq@Dw@Dm@@]@g@?g@Cs@?IGs@E_AG_@Ma@S_@[a@EGWc@U_@KWIg@@W@YJs@?APy@BGVaAb@sADQVs@`@yAXw@ZcAZcADMXgAVcAZ{@Xs@@ATe@Vc@`@o@PYN]Re@Lm@BY@]?k@IaAK_@GYcB{EISo@_Ba@gAgBmEs@iCg@_CUmBK{C@{AJ_B?I\\sDd@_EDSl@wCrA_Fb@eBXcAj@{BxAiFfAyDhBmGXcAfA{CBGTe@`@m@BETW@AZUd@WtAk@x@[HEbAa@h@OTEPC`AS`@KVGDEXWX_@FK"
+                    },
+                    "start_location": {
+                        "lat": 6.316940799999999,
+                        "lng": 7.4142068
+                    },
+                    "travel_mode": "DRIVING"
+                },
+                {
+                    "distance": {
+                        "text": "13.9 km",
+                        "value": 13925
+                    },
+                    "duration": {
+                        "text": "14 mins",
+                        "value": 829
+                    },
+                    "end_location": {
+                        "lat": 6.420194299999999,
+                        "lng": 7.5356599
+                    },
+                    "html_instructions": "Turn <b>left<\/b> at the gas station onto <b>Enugu-Ph Hwy<\/b>\/<wbr\/><b>Iriebe-Mbara Akuma-Lokpanta Rd<\/b>\/<wbr\/><b>Port Harcourt - Enugu Expy<\/b>\/<wbr\/><b>A3<\/b><div style=\"font-size:0.9em\">Pass by the park (on the right)<\/div><div style=\"font-size:0.9em\">Destination will be on the right<\/div>",
+                    "maneuver": "turn-left",
+                    "polyline": {
+                        "points": "}qpe@mlsl@HEBAFK\\m@SKkB{@wFqCw@_@sEwBkHkDuDeBuDiBi@SiAg@mCcA_A]OGoBg@oA[}@UoE_AMEmCm@u@Q_Ci@C?{D{@gDu@i@MaE_AyD{@SEqE{@}Cq@_B_@w@OKCkAW}@U_H_B_B]qDy@o@M}EgAcGqAGAcCg@_E}@cAQe@IQCeBWmCa@SCKCcAOyAQeBUqFs@wAQo@IcDc@yDe@iC[eAOyBYq@IyASc@Ec@G}B[m@IuHaAkFs@oCa@{AWgGkAiKoBsCi@w@Oc@Ik@M_AQu@MsB_@qB]yGsAMAs@OiFcA_B[kCi@qB[aB[iEw@gCk@_@I}B[[GGAUEmASyAS_Dc@yEi@{Ee@qAEaGi@iFm@_BUwC_@{AWqB_@A?QCgEs@OE}EeAiCm@qBq@sAg@SI}Aq@GCmAo@c@U[SA?cAs@{@m@OKgB{AkAeAgBqBeAqAW_@aA{Aq@kA{@aBQ_@Yq@Qa@s@oBk@eBMa@Sq@mAuDAEgAyDWw@iAqDoAiE[aAAEACAGGO[cAYaA[cAg@cBmBkGaBgFa@_Ag@kAo@oAc@{@m@cAm@aAm@_AcAqAqBcCgBiBsCgCo@k@{AqA}AoAoDsCMKiA_AyAeAQMmCkBOK}@o@wDgCSMa@Wi@]_B_A{@g@qDuBMGSKIE_@Sc@UEEoAo@]QSMKEqCwAiBaA]O]Q}Au@MGKIu@_@]Q}@e@_@QsGiDwC_BgGeDmBkAaAo@oA{@_C}AOK[Ww@k@SM{AkAcBqAmAaAmBaB{@u@oCeCw@s@y@u@wAoAi@e@{AsAGGmBgBgAaA"
+                    },
+                    "start_location": {
+                        "lat": 6.3159921,
+                        "lng": 7.477352299999999
+                    },
+                    "travel_mode": "DRIVING"
+                }
+            ],
+            "traffic_speed_entry": [],
+            "via_waypoint": []
+        }
+    ],
+    "overview_polyline": {
+        "points": "wtwc@irfj@gJwGoFiBgIu@eEd@yFlByFwB_McDgNqDO?GLZv@~DpM\\dFaFrVc@jF~@xFEfGc@fCqB`DyAvEkBjHyPtS{DrEqCbA_OvCiLdBcHvC{OvG{UnLwPpDyOtFoe@vQaS`H_TfP{F`ImI~N}ExC{IlCqa@tK}OhCsK`Cuo@nNyRbEsLbA_YvIoFpBcDhCuHfIyFlEiF~AmMfEoExEuJdKsMvDcFLaHeFoLcJcHeCcMeFoMwGeIa@wH^_Tr@U@g\\kC_j@uEkJ}@qHiBiFl@iBd@mB[mMmI_F_CqCBoCPyBm@}IsEwUcMu@O}Cv@{N`GsT`DoP}A{HcGgH_HaDsD}DqAcFuDwFwB{DSuHsB_B{Au@wD{D{Kz@gJW_EkGuIsEcFsBk@mLIkB^_DvBe@FI@KN{DzD{CbCqC|E_AzAoGrHgY`OoDlCgJpNuIzJoBrBi@h@iCoBuDoCa@GiJcHoOuLoC{BwGsIuEoNu@cILsOX}SiCaOqDiI_FoGqMeK}LeNyGcLaFkNoDmRw@wQmCgkAuAal@eAi`@[kDtD[B@H@FAHKaBgD{tAknCiPc\\gI}Lw]co@oAeG}@aQxBkUEmKcEwMyKcWuJaRmCkFoAsDD_AtCaGzOaTfHgEpDo@pA]v@yASyC_BmFoC_IsAgBkJaJuVkWcIyIaHeGaBiCgAoDm@sGEwAd@mEZsCYgBWeJDgMLeM|C_JbEkHzC}GUeOeAoJjAsH|DyFxCwHnEoJL}Ac@{A}BgC_AoCt@gXbAoW|Feh@tBmc@LaRPaa@g@sNqC}m@cDol@m@qJTeCrCaKc@wNVeNoKqa@mJcXgByCoDuBqKmFsRuMaCgFgIe[s^auAoUmz@}Hk_@qOkt@so@mvDqCgJoEkKySwg@sHaSiJeYeLkg@mKak@qOcy@_Iij@eBy][}BuCyBwJuFmBgE{@kBaBNwDp@cCNw@c@qBsEqGDoAB]kFkBmPs@iBuDyDmFkDiEaAcDgAeGmFyE{GoIiS_@wDhGcGVwA}CkGQ_Hs@oCTq@`BGhBh@Xc@mBoBmB_Dw@iD}AkIfAqVM}Gx@kChCgD`IyHpDkHbAwIe@cImAmBi@wBdByHbEgNhDcHf@kC]gD_EwK{CwI}@mF@aJvB_PbN{f@bCwFv@u@tIaD`Cm@dAiATgAoReJi^aP_XiG_y@oQ}p@mM}x@iK}`A_Q{o@gLgi@{FwXcG}IaEwFiEqGiHmIsQkJ}Z{BmHyGwSiD{GqGwIgKoJ_RoNyZ_Rka@}SkVkOsS_QuMqL"
+    },
+    "summary": "Udi-Ngwo Rd",
+    "warnings": [],
+    "waypoint_order": []
+}

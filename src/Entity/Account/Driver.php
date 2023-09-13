@@ -24,6 +24,14 @@ class Driver
     #[ORM\JoinColumn(nullable: false)]
     private ?User $userAccount = null;
 
+    #[GQL\Field()]
+    #[ORM\Column(
+        options: [
+            'default' => true
+        ]
+    )]
+    private ?bool $verified = null;
+
     public function getId(): ?Ulid
     {
         return $this->id;
@@ -37,6 +45,18 @@ class Driver
     public function setUserAccount(User $userAccount): static
     {
         $this->userAccount = $userAccount;
+
+        return $this;
+    }
+
+    public function isVerified(): ?bool
+    {
+        return $this->verified;
+    }
+
+    public function setVerified(bool $verified): static
+    {
+        $this->verified = $verified;
 
         return $this;
     }

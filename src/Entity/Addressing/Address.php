@@ -6,6 +6,7 @@ use App\Repository\Addressing\AddressRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Overblog\GraphQLBundle\Annotation as GQL;
 use Symfony\Bridge\Doctrine\Types\UlidType;
+use Symfony\Component\Intl\Countries;
 use Symfony\Component\Uid\Ulid;
 
 #[GQL\Type()]
@@ -82,8 +83,13 @@ class Address
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $googleId = null;
 
+    #[GQL\Field()]
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $formatted = null;
+
+    #[GQL\Field(type: 'DateTime')]
+    #[ORM\Column(nullable: true)]
+    private ?\DateTimeImmutable $arriveAt = null;
 
 
     public function __construct(?Ulid $id = null)
@@ -288,4 +294,59 @@ class Address
 
         return $this;
     }
+
+    public function getArriveAt(): ?\DateTimeImmutable
+    {
+        return $this->arriveAt;
+    }
+
+    public function setArriveAt(?\DateTimeImmutable $arriveAt): static
+    {
+        $this->arriveAt = $arriveAt;
+
+        return $this;
+    }
+
+
+    #[GQL\Field(name: 'fullyFormatted')]
+    public function getFullyFormattedRepresentaion(): string
+    {
+        return trim(sprintf('%s %s', $this->getCompany(),$this->getFormattedRepresentaion()));
+    }
+
+
+    #[GQL\Field(name: 'formatted')]
+    public function getFormattedRepresentaion(): string
+    {
+        $formatted = '';
+
+
+        // if ($this->company)
+        //     $formatted .= $this->company;
+
+        if ($this->street)
+            $formatted .= ($formatted? ($formatted? ', ' : '' ) : '' ) . $this->street;
+
+        if ($this->postcode)
+            $formatted .=  ($formatted? ($formatted? ', ' : '' ) : '' ) . $this->postcode;
+
+        if ($this->city)
+            $formatted .= ($formatted? ', ' : '' ) . $this->city;
+
+        if ($this->provinceName)
+            $formatted .= ($formatted? ', ' : '' ) . $this->provinceName;
+
+        if ($code = $this->countryCode) {
+            if (strlen($code) === 3)
+                $formatted .= ($formatted? ', ' : '' ) . Countries::getAlpha3Name($code);
+            elseif (strlen($code) === 2)
+                $formatted .= ($formatted? ', ' : '' ) . Countries::getAlpha3Name(Countries::getAlpha3Code($code));
+
+        }
+
+        return $formatted;
+        // return trim(sprintf('%s, %s, %s, %s', $this->street, $this->city, $this->provinceName, $this->countryCode));
+    }
+
+ 
 }

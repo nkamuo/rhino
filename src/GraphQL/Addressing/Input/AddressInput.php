@@ -28,7 +28,7 @@ abstract class AddressInput
     #[GQL\Field()]
     public ?string $company = null;
 
-    #[Assert\Length(exactly: 3)]
+    #[Assert\Length(exactly: 2)]
     #[GQL\Field()]
     public ?string $countryCode = null;
 

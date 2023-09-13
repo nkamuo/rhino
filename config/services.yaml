@@ -6,26 +6,38 @@
 imports:
     - graphql/config.yaml
 parameters:
+    google_maps.api_key: '%env(GOOGLE_MAPS_API_KEY)%'
 
 services:
     # default configuration for services in *this* file
     _defaults:
-        autowire: true      # Automatically injects dependencies in your services.
+        autowire: true # Automatically injects dependencies in your services.
         autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
 
     # makes classes in src/ available to be used as services
     # this creates a service per class whose id is the fully-qualified class name
     App\:
-        resource: '../src/'
+        resource: "../src/"
         exclude:
-            - '../src/DependencyInjection/'
-            - '../src/Entity/'
-            - '../src/Kernel.php'
+            - "../src/DependencyInjection/"
+            - "../src/Entity/"
+            - "../src/Kernel.php"
 
-    
     App\GraphQL\:
-        resource: '../src/GraphQL'
+        resource: "../src/GraphQL"
         public: true
+
+    App\Service\Google\DirectionsServiceInterface:
+        class: App\Service\Google\DirectionsService
+        arguments:
+            $apiKey: "%google_maps.api_key%"
+
+    Brick\Geo\Engine\GeometryEngine:
+        factory:
+            [
+                '@App\Service\Geometery\GeometryEngineProvider',
+                "getGeometryEngine",
+            ]
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones

@@ -3,12 +3,14 @@
 namespace App\Entity\Addressing;
 
 use App\Repository\Addressing\CoordinateRepository;
+use Brick\Geo\Point;
 use Doctrine\ORM\Mapping as ORM;
 use Overblog\GraphQLBundle\Annotation as GQL;
 use Symfony\Bridge\Doctrine\Types\UlidType;
 use Symfony\Component\Uid\Ulid;
 
 #[GQL\Type()]
+#[ORM\Table(name:'address_coordinates')]
 #[ORM\Entity(repositoryClass: CoordinateRepository::class)]
 class Coordinate
 {
@@ -86,5 +88,9 @@ class Coordinate
         $this->accuracy = $accuracy;
 
         return $this;
+    }
+
+    public function toPoint(): Point{
+        return  Point::fromText("POINT({$this->latitude} {$this->longitude})");
     }
 }
