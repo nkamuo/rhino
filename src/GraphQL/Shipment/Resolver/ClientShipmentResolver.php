@@ -15,6 +15,7 @@ use App\Repository\Addressing\UserAddressRepository;
 use App\Repository\Catalog\UserProductRepository;
 use App\Repository\Shipment\ShipmentRepository;
 use App\Service\Google\DirectionsServiceInterface;
+use App\Service\Identity\CodeGeneratorInterface;
 use App\Util\Doctrine\QueryBuilderHelper;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
@@ -44,6 +45,7 @@ class ClientShipmentResolver
         private UserAddressRepository $userAddressRepository,
         private UserProductRepository $userProductRepository,
         private DirectionsServiceInterface $directionsService,
+        private CodeGeneratorInterface $codeGenerator,
     ) {
     }
 
@@ -54,12 +56,11 @@ class ClientShipmentResolver
 
     #[Query(name: "get_shipment_item",)]
     #[GQL\Arg(
-        name: 'name',
-        type: 'Ulid'
+        name: 'id',
+        type: 'Ulid!'
     )]
-    public function getShipmentItem(
-        #[GQL\Arg(type: 'Ulid')] Ulid $id
-    ): Shipment {
+    public function getShipmentItem(Ulid $id): Shipment
+    {
 
         $shipment = $this->shipmentRepository->find($id);
         if ($shipment === null) {
@@ -68,11 +69,11 @@ class ClientShipmentResolver
             );
         }
 
-        if (!$this->security->isGranted('view', $shipment)) {
-            throw new UserError(
-                message: "Permision Denied: You may not view this resource"
-            );
-        }
+        // if (!$this->security->isGranted('view', $shipment)) {
+        //     throw new UserError(
+        //         message: "Permision Denied: You may not view this resource"
+        //     );
+        // }
 
 
 
@@ -139,7 +140,10 @@ class ClientShipmentResolver
 
         $shipment = new Shipment();
 
+        $code = $this->codeGenerator->generateCode(length: 8);
+
         $shipment
+            ->setCode($code)
             ->setType($input->type)
             ->setBillingAddress($billingAddress)
             ->setOriginAddress($originAddress)

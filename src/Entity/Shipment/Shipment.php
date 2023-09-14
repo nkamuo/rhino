@@ -88,6 +88,10 @@ class Shipment
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $deliveryAt = null;
 
+    #[GQL\Field()]
+    #[ORM\Column(length: 32)]
+    private ?string $code = null;
+
 
     public function __construct(?Ulid $id = null)
     {
@@ -303,6 +307,18 @@ class Shipment
     public function setDeliveryAt(?\DateTimeImmutable $deliveryAt): static
     {
         $this->deliveryAt = $deliveryAt;
+
+        return $this;
+    }
+
+    public function getCode(): ?string
+    {
+        return $this->code;
+    }
+
+    public function setCode(string $code): static
+    {
+        $this->code = $code;
 
         return $this;
     }
