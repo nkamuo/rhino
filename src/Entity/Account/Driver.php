@@ -30,7 +30,7 @@ class Driver
             'default' => true
         ]
     )]
-    private ?bool $verified = null;
+    private ?bool $verified = false;
 
     public function getId(): ?Ulid
     {
