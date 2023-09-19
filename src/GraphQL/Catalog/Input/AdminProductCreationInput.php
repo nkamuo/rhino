@@ -7,5 +7,5 @@ use Symfony\Component\Uid\Ulid;
 class AdminProductCreationInput extends AdminProductInput{
     
     #[GQL\Field(type: "Ulid!")]
-    public Ulid $userId;
+    public Ulid $ownerId;
 }

@@ -4,11 +4,13 @@ namespace App\GraphQL\Catalog\Resolver;
 
 use App\Entity\Account\User;
 use App\Entity\Catalog\Product;
+use App\Entity\Catalog\ProductCategory;
 use App\Entity\Catalog\UserProduct;
 use App\GraphQL\Catalog\Input\ProductCreationInput;
 use App\GraphQL\Catalog\Input\ProductUpdateInput;
 use App\GraphQL\Catalog\Type\ProductConnection;
 use App\GraphQL\Catalog\Type\ProductEdge;
+use App\Repository\Catalog\ProductCategoryRepository;
 use App\Repository\Catalog\ProductRepository;
 use App\Repository\Catalog\UserProductRepository;
 use App\Util\Doctrine\QueryBuilderHelper;
@@ -33,6 +35,7 @@ class ClientProductResolver
 {
 
     public function __construct(
+        private ProductCategoryRepository $productCategoryRepository,
         private UserProductRepository $productRepository,
         private EntityManagerInterface $entityManager,
         private Security $security,
@@ -114,8 +117,11 @@ class ClientProductResolver
             throw new UserError("Permission Denied: You may not perform this operation");
         }
 
+        $category = $this->getProductCategoryById($input->categoryId);
+
         $product = new UserProduct();
         $input->build($product);
+        $product->setCategory($category);
         $product->setOwner($user);
 
         $this->entityManager->persist($product);
@@ -138,7 +144,10 @@ class ClientProductResolver
     public function updateProduct(Ulid $id, ProductUpdateInput $input): Product
     {
         $product = $this->getProductById($id);
+        $category = $this->getProductCategoryById($input->categoryId);
+
         $input->build($product);
+        $product->setCategory($category);
 
         $this->entityManager->persist($product);
         $this->entityManager->flush();
@@ -172,4 +181,15 @@ class ClientProductResolver
         }
         return $product;
     }
+    
+
+    private function getProductCategoryById(Ulid $id): ProductCategory
+    {
+        $vType = $this->productCategoryRepository->find($id);
+        if (null == $vType) {
+            throw new UserError("Could not find Catalog type with [id:{$id}]");
+        }
+        return $vType;
+    }
+    
 }

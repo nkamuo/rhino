@@ -6,6 +6,8 @@ use App\Entity\Account\User;
 use App\Repository\Addressing\UserAddressRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Overblog\GraphQLBundle\Annotation as GQL;
+use GraphQL\Type\Definition\Type;
+use Overblog\GraphQLBundle\Resolver\TypeResolver;
 
 #[GQL\Type()]
 #[ORM\Entity(repositoryClass: UserAddressRepository::class)]
@@ -27,5 +29,9 @@ class UserAddress extends Address
         $this->owner = $owner;
 
         return $this;
+    }
+    public function resolveGQLType(TypeResolver $typeResolver): Type
+    {
+        return $typeResolver->resolve('UserAddress');
     }
 }

@@ -3,35 +3,60 @@
 namespace App\Entity\Vehicle;
 
 use App\Repository\Vehicle\VehicleTypeRepository;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Overblog\GraphQLBundle\Annotation as GQL;
+use Symfony\Bridge\Doctrine\Types\UlidType;
+use Symfony\Component\Uid\Ulid;
 
+#[GQL\Type]
 #[ORM\Entity(repositoryClass: VehicleTypeRepository::class)]
 class VehicleType
 {
+    #[GQL\Field(type: 'Ulid')]
     #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column]
-    private ?int $id = null;
+    #[ORM\Column(type: UlidType::NAME, unique: true)]
+    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
+    #[ORM\CustomIdGenerator(class: 'doctrine.ulid_generator')]
+    private ?Ulid $id = null;
 
+    #[GQL\Field()]
     #[ORM\Column(length: 32)]
     private ?string $code = null;
 
+    #[GQL\Field()]
     #[ORM\Column(length: 12)]
     private ?string $shortName = null;
 
+    #[GQL\Field()]
     #[ORM\Column(length: 64)]
     private ?string $name = null;
 
+    #[GQL\Field()]
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $iconImage = null;
 
+    #[GQL\Field()]
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $primaryImage = null;
 
+    #[GQL\Field()]
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $coverImage = null;
 
-    public function getId(): ?int
+    #[GQL\Field()]
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $clientNote = null;
+
+    #[GQL\Field()]
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $driverNote = null;
+
+    #[GQL\Field()]
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    private ?string $description = null;
+
+    public function getId(): ?Ulid
     {
         return $this->id;
     }
@@ -104,6 +129,42 @@ class VehicleType
     public function setCoverImage(?string $coverImage): static
     {
         $this->coverImage = $coverImage;
+
+        return $this;
+    }
+
+    public function getClientNote(): ?string
+    {
+        return $this->clientNote;
+    }
+
+    public function setClientNote(?string $clientNote): static
+    {
+        $this->clientNote = $clientNote;
+
+        return $this;
+    }
+
+    public function getDriverNote(): ?string
+    {
+        return $this->driverNote;
+    }
+
+    public function setDriverNote(?string $driverNote): static
+    {
+        $this->driverNote = $driverNote;
+
+        return $this;
+    }
+
+    public function getDescription(): ?string
+    {
+        return $this->description;
+    }
+
+    public function setDescription(?string $description): static
+    {
+        $this->description = $description;
 
         return $this;
     }

@@ -7,11 +7,13 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Types\UlidType;
 use Symfony\Component\Uid\Ulid;
 use Overblog\GraphQLBundle\Annotation as GQL;
+use Overblog\GraphQLBundle\Resolver\TypeResolver;
+use GraphQL\Type\Definition\Type;
 
-#[GQL\Type()]
+#[GQL\TypeInterface(resolveType:'value.resolveGQLType(typeResolver)')]
 #[ORM\Entity(repositoryClass: ProductRepository::class)]
 #[ORM\InheritanceType("JOINED")]
-class Product
+abstract class Product
 {
     #[GQL\Field(type: "Ulid")]
     #[ORM\Id]
@@ -39,6 +41,10 @@ class Product
     #[GQL\Field()]
     #[ORM\Column(options:['default' => 0])]
     private ?int $weight = null;
+
+    #[GQL\Field()]
+    #[ORM\ManyToOne(inversedBy: 'products')]
+    private ?ProductCategory $category = null;
 
     public function getId(): ?Ulid
     {
@@ -101,6 +107,21 @@ class Product
     public function setWeight(int $weight): static
     {
         $this->weight = $weight;
+
+        return $this;
+    }
+
+    
+    abstract function resolveGQLType( TypeResolver $typeResolver): Type;
+
+    public function getCategory(): ?ProductCategory
+    {
+        return $this->category;
+    }
+
+    public function setCategory(?ProductCategory $category): static
+    {
+        $this->category = $category;
 
         return $this;
     }

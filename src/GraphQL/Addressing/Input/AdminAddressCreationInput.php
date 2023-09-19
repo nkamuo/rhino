@@ -7,5 +7,5 @@ use Symfony\Component\Uid\Ulid;
 class AdminAddressCreationInput extends AddressInput{
     
     #[GQL\Field(type: "Ulid!")]
-    public Ulid $userId;
+    public Ulid $ownerId;
 }

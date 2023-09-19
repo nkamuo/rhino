@@ -8,11 +8,13 @@ use Overblog\GraphQLBundle\Annotation as GQL;
 use Symfony\Bridge\Doctrine\Types\UlidType;
 use Symfony\Component\Intl\Countries;
 use Symfony\Component\Uid\Ulid;
+use Overblog\GraphQLBundle\Resolver\TypeResolver;
+use GraphQL\Type\Definition\Type;
 
-#[GQL\Type()]
+#[GQL\TypeInterface(resolveType:'value.resolveGQLType(typeResolver)')]
 #[ORM\InheritanceType("JOINED")]
 #[ORM\Entity(repositoryClass: AddressRepository::class)]
-class Address
+abstract class Address
 {
 
     #[GQL\Field(type: 'Ulid')]
@@ -349,4 +351,5 @@ class Address
     }
 
  
+    abstract function resolveGQLType( TypeResolver $typeResolver): Type;
 }

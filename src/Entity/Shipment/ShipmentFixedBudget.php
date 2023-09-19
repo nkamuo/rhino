@@ -3,9 +3,9 @@
 namespace App\Entity\Shipment;
 
 use App\Repository\Shipment\ShipmentFixedBudgetRepository;
-use GraphQL\Type\Definition\Type;
 use Doctrine\ORM\Mapping as ORM;
 use Overblog\GraphQLBundle\Annotation as GQL;
+use GraphQL\Type\Definition\Type;
 use Overblog\GraphQLBundle\Resolver\TypeResolver;
 use Symfony\Component\Validator\Constraints as Assert;
 

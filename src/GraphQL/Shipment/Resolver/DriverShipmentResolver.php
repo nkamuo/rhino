@@ -34,9 +34,9 @@ class DriverShipmentResolver
     }
 
 
-    #[Query(name: "get_shipment_item",)]
+    #[Query(name: "get_load_item",)]
     #[GQL\Arg(
-        name: 'name',
+        name: 'id',
         type: 'Ulid'
     )]
     public function getShipmentItem(
@@ -50,19 +50,17 @@ class DriverShipmentResolver
             );
         }
 
-        if (!$this->security->isGranted('view', $shipment)) {
-            throw new UserError(
-                message: "Permision Denied: You may not view this resource"
-            );
-        }
-
-
-
+        // if (!$this->security->isGranted('view', $shipment)) {
+        //     throw new UserError(
+        //         message: "Permision Denied: You may not view this resource"
+        //     );
+        // }
         return $shipment;
     }
 
-    #[GQL\Query(name: "get_shipment_list")]
-    #[GQL\Access("isGranted('ROLE_USER')")]
+
+    #[GQL\Query(name: "get_load_list")]
+    // #[GQL\Access("isGranted('ROLE_USER')")]
     public function getShipmentConnection(
         ?int $first,
         ?String $after,

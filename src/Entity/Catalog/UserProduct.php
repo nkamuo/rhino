@@ -6,12 +6,14 @@ use App\Entity\Account\User;
 use App\Repository\Catalog\UserProductRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Overblog\GraphQLBundle\Annotation as GQL;
+use GraphQL\Type\Definition\Type;
+use Overblog\GraphQLBundle\Resolver\TypeResolver;
 
 #[GQL\Type()]
 #[ORM\Entity(repositoryClass: UserProductRepository::class)]
 class UserProduct extends Product
 {
-    
+
     #[GQL\Field()]
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
@@ -27,5 +29,10 @@ class UserProduct extends Product
         $this->owner = $owner;
 
         return $this;
+    }
+
+    public function resolveGQLType(TypeResolver $typeResolver): Type
+    {
+        return $typeResolver->resolve('UserProduct');
     }
 }

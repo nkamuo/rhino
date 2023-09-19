@@ -5,6 +5,7 @@ namespace App\GraphQL\Account\Resolver;
 
 use App\Entity\Account\User;
 use App\GraphQL\Account\Input\UserCreationInput;
+use App\GraphQL\Account\Input\UserUpdateInput;
 use App\GraphQL\Account\Type\UserConnection;
 use App\GraphQL\Account\Type\UserEdge;
 use App\Repository\Account\UserRepository;
@@ -25,7 +26,7 @@ use Symfony\Component\Uid\Ulid;
     targetQueryTypes: ['AdminQuery'],
     targetMutationTypes: ['AdminMutation'],
 )]
-class AdminUserQueryResolver
+class AdminUserResolver
 {
 
     public function __construct(
@@ -71,11 +72,11 @@ class AdminUserQueryResolver
             );
         }
 
-        if (!$this->security->isGranted('view', $user)) {
-            throw new UserError(
-                message: "Permision Denied: You may not view this resource"
-            );
-        }
+        // if (!$this->security->isGranted('view', $user)) {
+        //     throw new UserError(
+        //         message: "Permision Denied: You may not view this resource"
+        //     );
+        // }
 
         return $user;
     }
@@ -126,6 +127,39 @@ class AdminUserQueryResolver
         $this->entityManager->persist($user);
         $this->entityManager->flush();
 
+        return $user;
+    }
+
+
+
+    #[GQL\Mutation()]
+    #[GQL\Arg(
+        name: 'id',
+        type: 'Ulid!'
+    )]
+    #[GQL\Arg(
+        name: 'input',
+        type: 'UserUpdateInput!'
+    )]
+    public function updateUser(Ulid $id, UserUpdateInput $input): User
+    {
+
+        $user = $this->getUserById($id);
+        $input->build($user);
+
+        $this->entityManager->persist($user);
+        $this->entityManager->flush();
+
+        return $user;
+    }
+
+
+    private function getUserById(Ulid $id): User
+    {
+        $user = $this->userRepository->find($id);
+        if (null === $user) {
+            throw new UserError("Cannot find user with [id:{$id}]");
+        }
         return $user;
     }
 }

@@ -322,4 +322,15 @@ class Shipment
 
         return $this;
     }
+
+    #[GQL\Field(name:'weight')]
+    public function calculateWeight(): int{
+        $weight = 0;
+        foreach($this->getItems() as $item){
+            if($iWeight = $item->getProduct()?->getWeight()){
+                $weight += $iWeight;
+            }
+        }
+        return $weight;
+    }
 }

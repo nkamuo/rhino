@@ -4,6 +4,7 @@ namespace App\GraphQL\Catalog\Input;
 
 use App\Entity\Catalog\Product;
 use Overblog\GraphQLBundle\Annotation as GQL;
+use Symfony\Component\Uid\Ulid;
 
 #[GQL\Input()]
 class ProductInput
@@ -23,6 +24,9 @@ class ProductInput
 
     #[GQL\Field()]
     public ProductDimensionInput $dimension;
+    
+    #[GQL\Field(type: "Ulid!")]
+    public Ulid $categoryId;
 
     public function build(Product $product): void
     {

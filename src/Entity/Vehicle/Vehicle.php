@@ -5,33 +5,50 @@ namespace App\Entity\Vehicle;
 use App\Entity\Account\Driver;
 use App\Repository\Vehicle\VehicleRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Overblog\GraphQLBundle\Annotation as GQL;
+use Symfony\Bridge\Doctrine\Types\UlidType;
+use Symfony\Component\Uid\Ulid;
 
+#[GQL\Type()]
 #[ORM\Entity(repositoryClass: VehicleRepository::class)]
 class Vehicle
 {
+    #[GQL\Field(type:'Ulid')]
     #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column]
+    #[ORM\Column(type: UlidType::NAME, unique: true)]
+    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
+    #[ORM\CustomIdGenerator(class: 'doctrine.ulid_generator')]
     private ?int $id = null;
 
+    #[GQL\Field()]
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
     private ?VehicleType $type = null;
 
+    #[GQL\Field()]
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
     private ?Driver $driver = null;
 
-    #[ORM\Column(length: 32)]
-    private ?string $status = null;
+    #[GQL\Field()]
+    #[ORM\Column(length: 32, enumType: VehicleStatus::class)]
+    private ?VehicleStatus $status = VehicleStatus::PENDING;
 
+    #[GQL\Field(type: 'DateTime')]
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $updatedAt = null;
 
+    #[GQL\Field(type: 'DateTime')]
     #[ORM\Column]
     private ?\DateTimeImmutable $createdAt = null;
 
-    public function getId(): ?int
+
+    public function __construct(?Ulid $id = null){
+        $this->id = $id;
+        $this->createdAt = new \DateTimeImmutable();
+    }
+
+    public function getId(): ?Ulid
     {
         return $this->id;
     }
@@ -60,12 +77,12 @@ class Vehicle
         return $this;
     }
 
-    public function getStatus(): ?string
+    public function getStatus(): ?VehicleStatus
     {
         return $this->status;
     }
 
-    public function setStatus(string $status): static
+    public function setStatus(VehicleStatus $status): static
     {
         $this->status = $status;
 
