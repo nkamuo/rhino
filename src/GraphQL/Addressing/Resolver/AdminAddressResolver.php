@@ -10,6 +10,7 @@ use App\GraphQL\Addressing\Type\AddressConnection;
 use App\GraphQL\Addressing\Type\AddressEdge;
 use App\Repository\Account\UserRepository;
 use App\Repository\Addressing\AddressRepository;
+use App\Repository\Addressing\UserAddressRepository;
 use App\Util\Doctrine\QueryBuilderHelper;
 use Doctrine\ORM\EntityManagerInterface;
 use Overblog\GraphQLBundle\Annotation as GQL;
@@ -29,7 +30,7 @@ class AdminAddressResolver
 {
 
     public function __construct(
-        private AddressRepository $addressRepository,
+        private UserAddressRepository $addressRepository,
         private EntityManagerInterface $entityManager,
         private Security $security,
         private UserRepository $userRepository,
@@ -62,6 +63,7 @@ class AdminAddressResolver
         ?int $first,
         ?String $after,
         ?String $filter,
+        ?String $search,
         ?String $sort,
     ): AddressConnection {
 
@@ -77,6 +79,26 @@ class AdminAddressResolver
         );
 
         $qb = $this->addressRepository->createQueryBuilder('address');
+
+
+        if ($search) {
+            $eb = $qb->expr();
+
+            $qb->join('address.owner', 'owner');
+            $qb
+                ->andWhere($qb->expr()->orX(
+                    $eb->like('address.firstName', ':search'),
+                    $eb->like('address.lastName', ':search'),
+                    $eb->like('address.company', ':search'),
+                    $eb->like('address.street', ':search'),
+                    $eb->like('address.city', ':search'),
+                    $eb->like('address.postcode', ':search'),
+                    $eb->like('address.provinceCode', ':search'),
+                    $eb->like('address.provinceName', ':search'),
+                    $eb->like('address.countryCode', ':search'),
+                ))
+                ->setParameter('search', "%{$search}%");
+        }
 
         QueryBuilderHelper::applyCriteria($qb, $filter, 'address');
 
