@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Util\Rsql;
 
 use App\Util\Rsql\Operator\EqualTo;
@@ -7,6 +8,7 @@ use App\Util\Rsql\Operator\GreaterThanOrEqualTo;
 use App\Util\Rsql\Operator\LessThan;
 use App\Util\Rsql\Operator\LessThanOrEqualTo;
 use App\Util\Rsql\Operator\NotLike;
+use App\Util\Rsql\Operator\SameWeek;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\QueryBuilder;
@@ -27,6 +29,7 @@ Operators::custom(NotLike::class);
 Operators::custom(EqualTo::class);
 Operators::custom(LessThan::class);
 Operators::custom(GreaterThan::class);
+Operators::custom(SameWeek::class);
 
 
 class ExceptionH extends \Exception
@@ -38,8 +41,8 @@ class RSQLHelper
 
     public function __construct(
         // private EntityManagerInterface $entityManager
-    ) {
-
+    )
+    {
     }
 
     private ?DoctrineQueryBuilder $doctrineQueryBuilder = null;
@@ -90,7 +93,7 @@ class RSQLHelper
 
     private function getBuilder(): DoctrineQueryBuilder
     {
-        $builder = /*$this->doctrineQueryBuilder ??=*/new DoctrineQueryBuilder();
+        $builder = /*$this->doctrineQueryBuilder ??=*/ new DoctrineQueryBuilder();
         foreach ($this->fieldTransformers as $field => $transformer) {
             $builder->addFieldTransformer($field, $transformer);
         }
@@ -117,7 +120,8 @@ class DoctrineQueryBuilder
 
     public function __construct(
         // private EntityManagerInterface $entityManager
-    ) {
+    )
+    {
         $this->setup();
     }
 
@@ -207,17 +211,15 @@ class DoctrineQueryBuilder
             $rootName .= '.';
         }
 
-        if (null !== $type){
-            if(is_array($value)){
-                $value = array_map(fn($data) => $this->normalizeValue($data, $type), $value);
-            }
-            else
+        if (null !== $type) {
+            if (is_array($value)) {
+                $value = array_map(fn ($data) => $this->normalizeValue($data, $type), $value);
+            } else
                 $value = $this->normalizeValue($value, $type);
         }
 
         $operator = $this->operatorBuilders[$operatorName];
         return $operator($qb, $rootName, $attrName, $type, $value);
-
     }
 
 
@@ -231,7 +233,7 @@ class DoctrineQueryBuilder
         }
 
 
-        if(in_array($type,['date','time','datetime'])){
+        if (in_array($type, ['date', 'time', 'datetime'])) {
             return  new \DateTime($value);
         }
 
@@ -287,16 +289,14 @@ class DoctrineQueryBuilder
                     $this->typeMappings[$subPath] = $alias; //$segment;
                 }
                 $parentAlias = $this->typeMappings[$subPath];
-
-
             } else {
 
                 $propPath = implode('.', array_slice($segments, $index));
 
                 // if (!$levelMetadata->hasField($segment)) {
-                    if ($levelMetadata->hasField($propPath)) {
-                        $segment = $propPath;
-                    }
+                if ($levelMetadata->hasField($propPath)) {
+                    $segment = $propPath;
+                }
                 // }
 
 
@@ -320,7 +320,6 @@ class DoctrineQueryBuilder
 
         $parentAlias = $segment;
         return false;
-
     }
 
 
@@ -456,7 +455,15 @@ class DoctrineQueryBuilder
             return $qb->expr()->isNotNull("{$rootName}{$alias}");
         });
 
+
+        $this->addOperator('=sameweek=', function (QueryBuilder $qb, string $rootName, string $alias, ?string $type, ?string $value) {
+            // list($rootName, $alias, $type) = $this->getOrJoinField($qb, $attrName);
+
+            $param = uniqid(':param_');
+            $qb->setParameter($param, $value);
+            //
+            $field = "{$rootName}{$alias}";
+            return "WEEK($field) = WEEK($param) AND YEAR($field) = YEAR($param)"; //
+        });
     }
-
-
 }

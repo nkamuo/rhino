@@ -56,6 +56,23 @@ class VehicleType
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $description = null;
 
+    #[GQL\Field()]
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $note = null;
+
+    #[GQL\Field(type: 'DateTime')]
+    #[ORM\Column(nullable: true)]
+    private ?\DateTimeImmutable $updatedAt = null;
+
+    #[GQL\Field(type: 'DateTime')]
+    #[ORM\Column]
+    private ?\DateTimeImmutable $createdAt = null;
+
+    public function __construct(?Ulid $id = null){
+        $this->id = $id;
+        $this->createdAt = new \DateTimeImmutable();
+    }
+
     public function getId(): ?Ulid
     {
         return $this->id;
@@ -165,6 +182,42 @@ class VehicleType
     public function setDescription(?string $description): static
     {
         $this->description = $description;
+
+        return $this;
+    }
+
+    public function getNote(): ?string
+    {
+        return $this->note;
+    }
+
+    public function setNote(?string $note): static
+    {
+        $this->note = $note;
+
+        return $this;
+    }
+
+    public function getUpdatedAt(): ?\DateTimeImmutable
+    {
+        return $this->updatedAt;
+    }
+
+    public function setUpdatedAt(?\DateTimeImmutable $updatedAt): static
+    {
+        $this->updatedAt = $updatedAt;
+
+        return $this;
+    }
+
+    public function getCreatedAt(): ?\DateTimeImmutable
+    {
+        return $this->createdAt;
+    }
+
+    public function setCreatedAt(\DateTimeImmutable $createdAt): static
+    {
+        $this->createdAt = $createdAt;
 
         return $this;
     }

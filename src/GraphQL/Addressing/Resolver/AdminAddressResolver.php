@@ -11,6 +11,7 @@ use App\GraphQL\Addressing\Type\AddressEdge;
 use App\Repository\Account\UserRepository;
 use App\Repository\Addressing\AddressRepository;
 use App\Repository\Addressing\UserAddressRepository;
+use App\Service\Identity\CodeGeneratorInterface;
 use App\Util\Doctrine\QueryBuilderHelper;
 use Doctrine\ORM\EntityManagerInterface;
 use Overblog\GraphQLBundle\Annotation as GQL;
@@ -34,6 +35,7 @@ class AdminAddressResolver
         private EntityManagerInterface $entityManager,
         private Security $security,
         private UserRepository $userRepository,
+        private CodeGeneratorInterface $codeGenerator,
     ) {
     }
 

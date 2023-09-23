@@ -19,21 +19,27 @@ class VehicleTypeInput
     public string $name;
 
     #[GQL\Field()]
-    public string $iconImage;
+    public ?string $iconImage = null;
 
     #[GQL\Field()]
-    public string $primaryImage;
+    public ?string $primaryImage = null;
 
     #[GQL\Field()]
-    public ?string $coverImage;
+    public ?string $coverImage = null;
 
 
     #[GQL\Field()]
-    public ?string $clientNote;
+    public ?string $clientNote = null;
 
     #[GQL\Field()]
-    public ?string $driverNote;
+    public ?string $driverNote = null;
 
     #[GQL\Field()]
-    public ?string $description;
+    public ?string $note = null;
+
+    #[GQL\Field()]
+    public ?string $description = null;
+
+    #[GQL\Field()]
+    public ?bool $enabled = false;
 }

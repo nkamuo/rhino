@@ -2,6 +2,7 @@
 
 namespace App\Entity\Account;
 
+use App\Entity\Addressing\Address;
 use App\Entity\Addressing\UserAddress;
 use App\Repository\Account\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -68,9 +69,22 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToOne(mappedBy: 'userAccount', cascade: ['persist', 'remove'])]
     private ?Driver $driver = null;
 
+    #[GQL\Field()]
+    #[ORM\OneToOne(cascade: ['persist', 'remove'])]
+    private ?Address $address = null;
+
+    #[GQL\Field(type: 'DateTime')]
+    #[ORM\Column(nullable: true)]
+    private ?\DateTimeImmutable $updatedAt = null;
+
+    #[GQL\Field(type: 'DateTime')]
+    #[ORM\Column()]
+    private ?\DateTimeImmutable $createdAt = null;
+
     public function __construct()
     {
         $this->addressess = new ArrayCollection();
+        $this->createdAt = new \DateTimeImmutable();
     }
 
     public function getId(): ?Ulid
@@ -109,7 +123,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         // guarantee every user at least has ROLE_USER
         $roles[] = 'ROLE_USER';
 
-        if($this->driver != null){
+        if ($this->driver != null) {
             $roles[] = 'ROLE_DRIVER';
         }
 
@@ -238,6 +252,42 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         }
 
         $this->driver = $driver;
+
+        return $this;
+    }
+
+    public function getAddress(): ?Address
+    {
+        return $this->address;
+    }
+
+    public function setAddress(?Address $address): static
+    {
+        $this->address = $address;
+
+        return $this;
+    }
+
+    public function getUpdatedAt(): ?\DateTimeImmutable
+    {
+        return $this->updatedAt;
+    }
+
+    public function setUpdatedAt(?\DateTimeImmutable $updatedAt): static
+    {
+        $this->updatedAt = $updatedAt;
+
+        return $this;
+    }
+
+    public function getCreatedAt(): ?\DateTimeImmutable
+    {
+        return $this->createdAt;
+    }
+
+    public function setCreatedAt(\DateTimeImmutable $createdAt): static
+    {
+        $this->createdAt = $createdAt;
 
         return $this;
     }

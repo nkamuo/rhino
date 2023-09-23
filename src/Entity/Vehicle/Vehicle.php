@@ -42,6 +42,12 @@ class Vehicle
     #[ORM\Column]
     private ?\DateTimeImmutable $createdAt = null;
 
+    #[ORM\Column(length: 32)]
+    private ?string $vin = null;
+
+    #[ORM\Column(length: 16)]
+    private ?string $licensePlateNumber = null;
+
 
     public function __construct(?Ulid $id = null){
         $this->id = $id;
@@ -109,6 +115,30 @@ class Vehicle
     public function setCreatedAt(\DateTimeImmutable $createdAt): static
     {
         $this->createdAt = $createdAt;
+
+        return $this;
+    }
+
+    public function getVin(): ?string
+    {
+        return $this->vin;
+    }
+
+    public function setVin(string $vin): static
+    {
+        $this->vin = $vin;
+
+        return $this;
+    }
+
+    public function getLicensePlateNumber(): ?string
+    {
+        return $this->licensePlateNumber;
+    }
+
+    public function setLicensePlateNumber(string $licensePlateNumber): static
+    {
+        $this->licensePlateNumber = $licensePlateNumber;
 
         return $this;
     }

@@ -19,7 +19,7 @@ class Driver
     #[ORM\CustomIdGenerator(class: 'doctrine.ulid_generator')]
     private ?Ulid $id = null;
 
-    #[GQL\Field()]
+    #[GQL\Field(name: 'user')]
     #[ORM\OneToOne(inversedBy: 'driver', cascade: ['persist', 'remove'])]
     #[ORM\JoinColumn(nullable: false)]
     private ?User $userAccount = null;
@@ -31,6 +31,18 @@ class Driver
         ]
     )]
     private ?bool $verified = false;
+
+    #[GQL\Field()]
+    #[ORM\Column(length: 32, enumType: DriverStatus::class)]
+    private ?DriverStatus $status = DriverStatus::PENDING;
+
+    #[GQL\Field(type: 'DateTime')]
+    #[ORM\Column(nullable: true)]
+    private ?\DateTimeImmutable $updatedAt = null;
+
+    #[GQL\Field(type: 'DateTime')]
+    #[ORM\Column]
+    private ?\DateTimeImmutable $createdAt = null;
 
     public function getId(): ?Ulid
     {
@@ -57,6 +69,42 @@ class Driver
     public function setVerified(bool $verified): static
     {
         $this->verified = $verified;
+
+        return $this;
+    }
+
+    public function getStatus(): ?DriverStatus
+    {
+        return $this->status;
+    }
+
+    public function setStatus(DriverStatus $status): static
+    {
+        $this->status = $status;
+
+        return $this;
+    }
+
+    public function getUpdatedAt(): ?\DateTimeImmutable
+    {
+        return $this->updatedAt;
+    }
+
+    public function setUpdatedAt(?\DateTimeImmutable $updatedAt): static
+    {
+        $this->updatedAt = $updatedAt;
+
+        return $this;
+    }
+
+    public function getCreatedAt(): ?\DateTimeImmutable
+    {
+        return $this->createdAt;
+    }
+
+    public function setCreatedAt(\DateTimeImmutable $createdAt): static
+    {
+        $this->createdAt = $createdAt;
 
         return $this;
     }

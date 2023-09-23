@@ -95,6 +95,7 @@ class AdminVehicleTypeResolver
             ->setCoverImage($input->coverImage)
             ->setClientNote($input->clientNote)
             ->setDriverNote($input->driverNote)
+            ->setNote($input->note)
             ->setDescription($input->description);
 
         $this->entityManager->persist($vehicleType);
