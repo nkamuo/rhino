@@ -4,6 +4,7 @@ namespace App\Entity\Vehicle;
 
 use App\Entity\Account\Driver;
 use App\Repository\Vehicle\VehicleRepository;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Overblog\GraphQLBundle\Annotation as GQL;
 use Symfony\Bridge\Doctrine\Types\UlidType;
@@ -13,12 +14,12 @@ use Symfony\Component\Uid\Ulid;
 #[ORM\Entity(repositoryClass: VehicleRepository::class)]
 class Vehicle
 {
-    #[GQL\Field(type:'Ulid')]
+    #[GQL\Field(type: 'Ulid')]
     #[ORM\Id]
     #[ORM\Column(type: UlidType::NAME, unique: true)]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(class: 'doctrine.ulid_generator')]
-    private ?int $id = null;
+    private ?Ulid $id = null;
 
     #[GQL\Field()]
     #[ORM\ManyToOne]
@@ -42,14 +43,33 @@ class Vehicle
     #[ORM\Column]
     private ?\DateTimeImmutable $createdAt = null;
 
+    #[GQL\Field()]
     #[ORM\Column(length: 32)]
     private ?string $vin = null;
 
+    #[GQL\Field()]
     #[ORM\Column(length: 16)]
     private ?string $licensePlateNumber = null;
 
+    #[GQL\Field()]
+    #[ORM\Column(nullable: true)]
+    private ?int $maxWeightCapacity = null;
 
-    public function __construct(?Ulid $id = null){
+    #[GQL\Field()]
+    #[ORM\OneToOne(cascade: ['persist', 'remove'])]
+    private ?VehicleDimension $dimension = null;
+
+    #[GQL\Field()]
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $note = null;
+
+    #[GQL\Field()]
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    private ?string $description = null;
+
+
+    public function __construct(?Ulid $id = null)
+    {
         $this->id = $id;
         $this->createdAt = new \DateTimeImmutable();
     }
@@ -139,6 +159,54 @@ class Vehicle
     public function setLicensePlateNumber(string $licensePlateNumber): static
     {
         $this->licensePlateNumber = $licensePlateNumber;
+
+        return $this;
+    }
+
+    public function getMaxWeightCapacity(): ?int
+    {
+        return $this->maxWeightCapacity;
+    }
+
+    public function setMaxWeightCapacity(?int $maxWeightCapacity): static
+    {
+        $this->maxWeightCapacity = $maxWeightCapacity;
+
+        return $this;
+    }
+
+    public function getDimension(): ?VehicleDimension
+    {
+        return $this->dimension;
+    }
+
+    public function setDimension(?VehicleDimension $dimension): static
+    {
+        $this->dimension = $dimension;
+
+        return $this;
+    }
+
+    public function getNote(): ?string
+    {
+        return $this->note;
+    }
+
+    public function setNote(?string $note): static
+    {
+        $this->note = $note;
+
+        return $this;
+    }
+
+    public function getDescription(): ?string
+    {
+        return $this->description;
+    }
+
+    public function setDescription(?string $description): static
+    {
+        $this->description = $description;
 
         return $this;
     }

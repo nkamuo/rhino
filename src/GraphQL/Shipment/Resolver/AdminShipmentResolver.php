@@ -39,7 +39,6 @@ use Symfony\Bridge\Doctrine\Types\UlidType;
 class AdminShipmentResolver
 {
 
-
     public function __construct(
         private Security $security,
         private EntityManagerInterface $entityManager,
@@ -120,11 +119,7 @@ class AdminShipmentResolver
     #[GQL\Mutation()]
     public function createNewShipment(AdminShipmentCreationInput $input): Shipment
     {
-        // $user = $this->security->getUser();
-        // if (!($user instanceof User)) {
-        //     throw new UserError("Permission Denied: You may not perform this operation");
-        // }
-
+      
 
         $user = $this->getUserById($input->ownerId);
 

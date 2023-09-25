@@ -19,7 +19,6 @@ class Driver
     #[ORM\CustomIdGenerator(class: 'doctrine.ulid_generator')]
     private ?Ulid $id = null;
 
-    #[GQL\Field(name: 'user')]
     #[ORM\OneToOne(inversedBy: 'driver', cascade: ['persist', 'remove'])]
     #[ORM\JoinColumn(nullable: false)]
     private ?User $userAccount = null;
@@ -49,6 +48,7 @@ class Driver
         return $this->id;
     }
 
+    #[GQL\Field(name: 'user')]
     public function getUserAccount(): ?User
     {
         return $this->userAccount;

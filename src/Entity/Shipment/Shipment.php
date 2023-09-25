@@ -92,6 +92,13 @@ class Shipment
     #[ORM\Column(length: 32)]
     private ?string $code = null;
 
+    #[ORM\Column(
+        options: [
+            'default' => 0,
+        ]
+    )]
+    private ?int $totalWeight = null;
+
 
     public function __construct(?Ulid $id = null)
     {
@@ -323,14 +330,27 @@ class Shipment
         return $this;
     }
 
-    #[GQL\Field(name:'weight')]
-    public function calculateWeight(): int{
+    #[GQL\Field(name: 'weight')]
+    public function calculateWeight(): int
+    {
         $weight = 0;
-        foreach($this->getItems() as $item){
-            if($iWeight = $item->getProduct()?->getWeight()){
+        foreach ($this->getItems() as $item) {
+            if ($iWeight = $item->getProduct()?->getWeight()) {
                 $weight += $iWeight;
             }
         }
         return $weight;
+    }
+
+    public function getTotalWeight(): ?int
+    {
+        return $this->totalWeight;
+    }
+
+    public function setTotalWeight(int $totalWeight): static
+    {
+        $this->totalWeight = $totalWeight;
+
+        return $this;
     }
 }

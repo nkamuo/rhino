@@ -3,22 +3,24 @@
 namespace App\Entity\Shipment;
 
 use App\Entity\Account\Driver;
+use App\Entity\Vehicle\Vehicle;
 use App\Repository\Shipment\ShipmentDriverBidRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Overblog\GraphQLBundle\Annotation as GQL;
 use Symfony\Bridge\Doctrine\Types\UlidType;
+use Symfony\Component\Uid\Ulid;
 
 #[GQL\Type()]
 #[ORM\Entity(repositoryClass: ShipmentDriverBidRepository::class)]
 class ShipmentDriverBid
 {
-    
+
     #[GQL\Field(type: "Ulid")]
     #[ORM\Id]
     #[ORM\Column(type: UlidType::NAME, unique: true)]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(class: 'doctrine.ulid_generator')]
-    private ?int $id = null;
+    private ?Ulid $id = null;
 
     #[GQL\Field()]
     #[ORM\ManyToOne(inversedBy: 'bids')]
@@ -31,14 +33,6 @@ class ShipmentDriverBid
     private ?Driver $driver = null;
 
     #[GQL\Field()]
-    #[ORM\Column]
-    private ?int $price = null;
-
-    #[GQL\Field()]
-    #[ORM\Column(length: 3)]
-    private ?string $currencyCode = null;
-
-    #[GQL\Field()]
     #[ORM\Column(length: 64, nullable: true)]
     private ?string $title = null;
 
@@ -47,8 +41,8 @@ class ShipmentDriverBid
     private ?string $description = null;
 
     #[GQL\Field()]
-    #[ORM\Column(length: 64)]
-    private ?string $status = null;
+    #[ORM\Column(length: 64, enumType: ShipmentBidStatus::class)]
+    private ?ShipmentBidStatus $status = ShipmentBidStatus::PENDING;
 
     #[GQL\Field(type: "DateTime")]
     #[ORM\Column(nullable: true)]
@@ -58,7 +52,27 @@ class ShipmentDriverBid
     #[ORM\Column]
     private ?\DateTimeImmutable $createdAt = null;
 
-    public function getId(): ?int
+    #[GQL\Field()]
+    #[ORM\ManyToOne]
+    private ?Vehicle $vehicle = null;
+
+    #[GQL\Field()]
+    #[ORM\OneToOne(cascade: ['persist', 'remove'])]
+    private ?ShipmentDriverBidPrice $price = null;
+
+    #[GQL\Field(type: "DateTime")]
+    #[ORM\Column(nullable: true)]
+    private ?\DateTimeImmutable $pickupAt = null;
+
+    #[GQL\Field(type: "DateTime")]
+    #[ORM\Column(nullable: true)]
+    private ?\DateTimeImmutable $deliveryAt = null;
+
+    public function __construct(){
+        $this->createdAt = new \DateTimeImmutable();
+    }
+
+    public function getId(): ?Ulid
     {
         return $this->id;
     }
@@ -87,30 +101,6 @@ class ShipmentDriverBid
         return $this;
     }
 
-    public function getPrice(): ?int
-    {
-        return $this->price;
-    }
-
-    public function setPrice(int $price): static
-    {
-        $this->price = $price;
-
-        return $this;
-    }
-
-    public function getCurrencyCode(): ?string
-    {
-        return $this->currencyCode;
-    }
-
-    public function setCurrencyCode(string $currencyCode): static
-    {
-        $this->currencyCode = $currencyCode;
-
-        return $this;
-    }
-
     public function getTitle(): ?string
     {
         return $this->title;
@@ -135,12 +125,12 @@ class ShipmentDriverBid
         return $this;
     }
 
-    public function getStatus(): ?string
+    public function getStatus(): ?ShipmentBidStatus
     {
         return $this->status;
     }
 
-    public function setStatus(string $status): static
+    public function setStatus(ShipmentBidStatus $status): static
     {
         $this->status = $status;
 
@@ -167,6 +157,54 @@ class ShipmentDriverBid
     public function setCreatedAt(\DateTimeImmutable $createdAt): static
     {
         $this->createdAt = $createdAt;
+
+        return $this;
+    }
+
+    public function getVehicle(): ?Vehicle
+    {
+        return $this->vehicle;
+    }
+
+    public function setVehicle(?Vehicle $vehicle): static
+    {
+        $this->vehicle = $vehicle;
+
+        return $this;
+    }
+
+    public function getPrice(): ?ShipmentDriverBidPrice
+    {
+        return $this->price;
+    }
+
+    public function setPrice(?ShipmentDriverBidPrice $price): static
+    {
+        $this->price = $price;
+
+        return $this;
+    }
+
+    public function getPickupAt(): ?\DateTimeImmutable
+    {
+        return $this->pickupAt;
+    }
+
+    public function setPickupAt(?\DateTimeImmutable $pickupAt): static
+    {
+        $this->pickupAt = $pickupAt;
+
+        return $this;
+    }
+
+    public function getDeliveryAt(): ?\DateTimeImmutable
+    {
+        return $this->deliveryAt;
+    }
+
+    public function setDeliveryAt(?\DateTimeImmutable $deliveryAt): static
+    {
+        $this->deliveryAt = $deliveryAt;
 
         return $this;
     }
