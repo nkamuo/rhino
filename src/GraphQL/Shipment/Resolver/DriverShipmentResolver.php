@@ -6,6 +6,7 @@ use App\Entity\Account\User;
 use App\Entity\Shipment\Shipment;
 use App\Entity\Shipment\ShipmentBidStatus;
 use App\Entity\Shipment\ShipmentDriverBid;
+use App\Entity\Shipment\ShipmentStatus;
 use App\Entity\Vehicle\Vehicle;
 use App\GraphQL\Shipment\Input\ShipmentBidCreationInput;
 use App\GraphQL\Shipment\Type\ShipmentConnection;
@@ -87,7 +88,10 @@ class DriverShipmentResolver
             fn (string $coursor, Shipment $shipment, int $index) => new ShipmentEdge($coursor, $shipment)
         );
 
-        $qb = $this->shipmentRepository->createQueryBuilder('shipment');
+        $qb = $this->shipmentRepository
+            ->createQueryBuilder('shipment')
+            ->andWhere('shipment.status = :status')
+            ->setParameter('status',ShipmentStatus::PUBLISHED);
 
 
         QueryBuilderHelper::applyCriteria($qb, $filter, 'shipment');
@@ -180,7 +184,8 @@ class DriverShipmentResolver
             ->setDriver($driver)
             ->setVehicle($vehicle)
             ->setTitle($input->title)
-            ->setDescription($input->description);
+            ->setDescription($input->description)
+            ;
 
         if ($input->pickupAt) {
             $bid->setPickupAt(DateTimeImmutable::createFromInterface($input->pickupAt));

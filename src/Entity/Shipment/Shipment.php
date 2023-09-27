@@ -99,6 +99,9 @@ class Shipment
     )]
     private ?int $totalWeight = null;
 
+    #[ORM\OneToOne(mappedBy: 'shipment', cascade: ['persist', 'remove'])]
+    private ?ShipmentOrder $shipmentOrder = null;
+
 
     public function __construct(?Ulid $id = null)
     {
@@ -350,6 +353,23 @@ class Shipment
     public function setTotalWeight(int $totalWeight): static
     {
         $this->totalWeight = $totalWeight;
+
+        return $this;
+    }
+
+    public function getShipmentOrder(): ?ShipmentOrder
+    {
+        return $this->shipmentOrder;
+    }
+
+    public function setShipmentOrder(ShipmentOrder $shipmentOrder): static
+    {
+        // set the owning side of the relation if necessary
+        if ($shipmentOrder->getShipment() !== $this) {
+            $shipmentOrder->setShipment($this);
+        }
+
+        $this->shipmentOrder = $shipmentOrder;
 
         return $this;
     }

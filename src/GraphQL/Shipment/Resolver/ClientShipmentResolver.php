@@ -6,13 +6,18 @@ use App\Entity\Account\User;
 use App\Entity\Addressing\UserAddress;
 use App\Entity\Catalog\UserProduct;
 use App\Entity\Shipment\Shipment;
+use App\Entity\Shipment\ShipmentBidStatus;
+use App\Entity\Shipment\ShipmentDriverBid;
 use App\Entity\Shipment\ShipmentItem;
+use App\Entity\Shipment\ShipmentOrder;
+use App\Entity\Shipment\ShipmentStatus;
 use App\GraphQL\Shipment\Input\ShipmentCreationInput;
 use App\GraphQL\Shipment\Input\ShipmentItemInput;
 use App\GraphQL\Shipment\Type\ShipmentConnection;
 use App\GraphQL\Shipment\Type\ShipmentEdge;
 use App\Repository\Addressing\UserAddressRepository;
 use App\Repository\Catalog\UserProductRepository;
+use App\Repository\Shipment\ShipmentDriverBidRepository;
 use App\Repository\Shipment\ShipmentRepository;
 use App\Service\Google\DirectionsServiceInterface;
 use App\Service\Identity\CodeGeneratorInterface;
@@ -44,6 +49,7 @@ class ClientShipmentResolver
         private ShipmentRepository $shipmentRepository,
         private UserAddressRepository $userAddressRepository,
         private UserProductRepository $userProductRepository,
+        private ShipmentDriverBidRepository $shipmentDriverBidRepository,
         private DirectionsServiceInterface $directionsService,
         private CodeGeneratorInterface $codeGenerator,
     ) {
@@ -191,13 +197,127 @@ class ClientShipmentResolver
     }
 
 
-    private function getUserProduct(Ulid $id, User $user): UserProduct
+
+
+    #[GQL\Mutation()]
+    #[GQL\Arg(name: 'id', type: 'Ulid!')]
+    public function acceptShipmentBid(Ulid $id): ShipmentOrder
     {
-        $address = $this->userProductRepository->find($id);
-        if (null == $address || $address->getOwner() != $user) {
+        $user = $this->getUser();
+        $bid = $this->getUserShipmentBid($id);
+        $shipment = $bid->getShipment();
+
+        
+        if ($shipment->getShipmentOrder() != null) {
+            throw new UserError("This shipment already has an order");
+        }
+
+
+        if ($bid->getStatus() != ShipmentBidStatus::PENDING) {
+            throw new UserError("This bid cannot be accepted");
+        }
+
+        $code = $this->codeGenerator->generateCode(length: 6);
+        $price = $bid->getPrice(); //?? $shipment->getBudget();
+        $currency = $price?->getCurrency();
+        $amount = $price?->getAmount();
+
+        $order = new ShipmentOrder();
+        $order
+            ->setCode($code)
+            ->setVehicle($bid->getVehicle())
+            ->setShipment($shipment)
+            ->setBid($bid)
+            ->setDriver($bid->getDriver())
+            ->setShipper($user)
+            ->setCurrency($currency)
+            ->setSubtotal($amount)
+            ->setPickupAt($bid->getPickupAt() ?? $shipment->getPickupAt())
+            ->setDeliveryAt($bid->getDeliveryAt() ?? $shipment->getDeliveryAt())
+
+            ;
+
+        $shipment
+            ->setShipmentOrder($order)
+            ->setStatus(ShipmentStatus::PROCESSING)
+            ;
+        $bid->setStatus(ShipmentBidStatus::ACCEPTED);
+
+        $this->entityManager->persist($shipment);
+        $this->entityManager->flush();
+
+        return $order;
+    }
+
+
+
+    
+
+    #[GQL\Mutation()]
+    #[GQL\Arg(name: 'id', type: 'Ulid!')]
+    public function rejectShipmentBid(Ulid $id): bool
+    {
+        $user = $this->getUser();
+        $bid = $this->getUserShipmentBid($id);
+        $shipment = $bid->getShipment();
+
+        
+        if ($shipment->getShipmentOrder()?->getBid() == $bid) {
+            throw new UserError("This shipment bid already has an order");
+        }
+
+
+        if ($bid->getStatus() != ShipmentBidStatus::PENDING) {
+            throw new UserError("This bid cannot be rejected");
+        }
+
+        $bid->setStatus(ShipmentBidStatus::REJECTED);
+
+        $this->entityManager->persist($shipment);
+        $this->entityManager->flush();
+
+
+        return true;
+    }
+
+
+
+
+    private function getUser(): User
+    {
+        $user = $this->security->getUser();
+        if (!($user instanceof User)) {
+            throw new UserError("Permission Denied: You may not perform this operation");
+        }
+        return $user;
+    }
+
+    private function getUserShipmentBid(Ulid $id): ShipmentDriverBid
+    {
+        $bid = $this->shipmentDriverBidRepository->find($id);
+        if (null == $bid || $bid->getShipment()?->getOwner() != $this->getUser()) {
+            throw new UserError("Could not find bid with [id:{$id}] on your shipments");
+        }
+        return $bid;
+    }
+
+
+    private function getUserShipment(Ulid $id, User $user): Shipment
+    {
+        $shipment = $this->shipmentRepository->find($id);
+        if (null == $shipment || $shipment->getOwner() != $user) {
             throw new UserError("Could not find your product with [id:{$id}]");
         }
-        return $address;
+        return $shipment;
+    }
+
+    private function getUserProduct(Ulid $id, User $user): UserProduct
+    {
+        $product = $this->userProductRepository->find($id);
+        if (null == $product || $product->getOwner() != $user) {
+            throw new UserError("Could not find your product with [id:{$id}]");
+        }
+        return $product;
     }
 
     private function getUserAddress(Ulid $id, User $user): UserAddress

@@ -17,7 +17,7 @@ class ShipmentBidInput
     public Ulid $vehicleId;
 
     #[GQL\Field()]
-    public ?ShipmentDriverBidInput $price = null;
+    public ShipmentDriverBidInput $price;
 
 
     #[GQL\Field(type: 'DateTimeImmutable')]
