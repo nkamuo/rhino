@@ -5,7 +5,7 @@ namespace App\Entity\Shipment;
 use Overblog\GraphQLBundle\Annotation as GQL;
 
 #[GQL\Enum()]
-enum ShipmentOrderStatus: string
+enum ShipmentExecutionStatus: string
 {
     case PENDING = 'PENDING';
     case CANCELLED = 'CANCELLED';

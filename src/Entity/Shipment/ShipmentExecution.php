@@ -57,13 +57,19 @@ class ShipmentExecution
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $createdAt = null;
 
+    #[ORM\Column(length: 32)]
+    private ?string $code = null;
+
+    #[ORM\Column(length: 32, enumType:ShipmentExecutionStatus::class)]
+    private ShipmentExecutionStatus $status = ShipmentExecutionStatus::PENDING;
+
     public function __construct()
     {
         $this->orders = new ArrayCollection();
         $this->createdAt = new \DateTimeImmutable();
     }
 
-    public function getId(): ?int
+    public function getId(): ?Ulid
     {
         return $this->id;
     }
@@ -178,6 +184,30 @@ class ShipmentExecution
     public function setCreatedAt(?\DateTimeImmutable $createdAt): static
     {
         $this->createdAt = $createdAt;
+
+        return $this;
+    }
+
+    public function getCode(): ?string
+    {
+        return $this->code;
+    }
+
+    public function setCode(string $code): static
+    {
+        $this->code = $code;
+
+        return $this;
+    }
+
+    public function getStatus(): ShipmentExecutionStatus
+    {
+        return $this->status;
+    }
+
+    public function setStatus(ShipmentExecutionStatus $status): static
+    {
+        $this->status = $status;
 
         return $this;
     }

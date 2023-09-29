@@ -3,9 +3,11 @@
 namespace App\GraphQL\Shipment\Resolver;
 
 use App\Entity\Account\User;
+use App\Entity\Shipment\ShipmentExecution;
+use App\Entity\Shipment\ShipmentExecutionStatus;
 use App\Entity\Shipment\ShipmentOrder;
-use App\Entity\Shipment\ShipmentOrderBidStatus;
-use App\Entity\Shipment\ShipmentOrderDriverBid;
+use App\Entity\Shipment\ShipmentOrderOrderStatus;
+use App\Entity\Shipment\ShipmentOrderStatus;
 use App\Entity\Vehicle\Vehicle;
 use App\GraphQL\Shipment\Input\ShipmentOrderBidCreationInput;
 use App\GraphQL\Shipment\Type\ShipmentOrderConnection;
@@ -15,6 +17,7 @@ use App\GraphQL\Shipment\Type\ShipmentOrderEdge;
 use App\Repository\Shipment\ShipmentOrderDriverBidRepository;
 use App\Repository\Shipment\ShipmentOrderRepository;
 use App\Repository\Vehicle\VehicleRepository;
+use App\Service\Identity\CodeGeneratorInterface;
 use App\Util\Doctrine\QueryBuilderHelper;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
@@ -40,6 +43,7 @@ class DriverShipmentOrderResolver
     public function __construct(
         private EntityManagerInterface $entityManager,
         private ShipmentOrderRepository $shipmentOrderRepository,
+        private CodeGeneratorInterface $codeGenerator,
         private VehicleRepository $vehicleRepository,
         private Security $security,
     ) {
@@ -112,6 +116,58 @@ class DriverShipmentOrderResolver
     }
 
 
+
+
+    
+
+    #[GQL\Mutation()]
+    #[GQL\Arg(name: 'id', type: 'Ulid!')]
+    public function startShipmentOrder(Ulid $id): ShipmentOrder
+    {
+        $driver = $this->getDriver();
+        $order = $this->getDriverShipmentOrder($id);
+        $shipment = $order->getShipment();
+
+        
+        if (($status = $order->getExecution()) != null) {
+            throw new UserError(sprintf("This shipment order execution is already \"%s\"", $status->getStatus()->value));
+        }
+
+
+        if ($order->getStatus() != ShipmentOrderStatus::PENDING) {
+            throw new UserError("This order cannot be accepted");
+        }
+
+        $code = $this->codeGenerator->generateCode(length: 6);
+        $execution = new ShipmentExecution();
+        $execution
+            ->setCode($code)
+            ->setVehicle($order->getVehicle())
+            ->setDriver($driver)
+            ;
+
+        $execution
+            ->addOrder($order)
+            ->setStatus(ShipmentExecutionStatus::PROCESSING)
+            ;
+        $order->setStatus(ShipmentOrderStatus::PROCESSING);
+
+        $this->entityManager->persist($execution);
+        $this->entityManager->flush();
+
+        return $order;
+    }
+
+
+    
+    private function getDriverShipmentOrder(Ulid $id): ShipmentOrder
+    {
+        $order = $this->shipmentOrderRepository->find($id);
+        if (null == $order || $order->getDriver() != $this->getDriver()) {
+            throw new UserError("Could not find shipment order with [id:{$id}] on your repository");
+        }
+        return $order;
+    }
 
 
     private function getUser(): User
