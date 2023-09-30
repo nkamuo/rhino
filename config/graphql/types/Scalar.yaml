@@ -1,0 +1,12 @@
+# VehicleStatus:
+#     type: enum
+#     config:
+#         enumClass: App\Entity\Transport\Vehicle\VehicleStatus
+#         # values:
+#         #     GREEN:
+#         #         description: "The color green"
+
+UploadFile:
+  type: custom-scalar
+  config:
+    scalarType: '@=newObject("Overblog\\GraphQLBundle\\Upload\\Type\\GraphQLUploadType")'

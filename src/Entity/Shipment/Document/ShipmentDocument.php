@@ -22,13 +22,21 @@ class ShipmentDocument
     #[ORM\CustomIdGenerator(class: 'doctrine.ulid_generator')]
     private ?Ulid $id = null;
 
-    #[GQL\Field(type:'[ShipmentDocumentAttachment!]!')]
-    #[ORM\OneToMany(mappedBy: 'document', targetEntity: ShipmentDocumentAttachment::class, orphanRemoval: true)]
+    #[GQL\Field(type: '[ShipmentDocumentAttachment!]!')]
+    #[ORM\OneToMany(mappedBy: 'document', targetEntity: ShipmentDocumentAttachment::class, orphanRemoval: true, cascade:['persist', 'remove'])]
     private Collection $attachments;
 
     #[GQL\Field()]
     #[ORM\OneToOne(mappedBy: 'pickupConfirmation', cascade: ['persist', 'remove'])]
     private ?ShipmentOrder $shipmentOrder = null;
+
+    #[GQL\Field(type: 'Json')]
+    #[ORM\Column]
+    private array $meta = [];
+
+    #[GQL\Field()]
+    #[ORM\Column(length: 32, enumType: ShipmentDocumentType::class)]
+    private ?ShipmentDocumentType $type = null;
 
     public function __construct()
     {
@@ -88,6 +96,30 @@ class ShipmentDocument
         }
 
         $this->shipmentOrder = $shipmentOrder;
+
+        return $this;
+    }
+
+    public function getMeta(): array
+    {
+        return $this->meta;
+    }
+
+    public function setMeta(array $meta): static
+    {
+        $this->meta = $meta;
+
+        return $this;
+    }
+
+    public function getType(): ?ShipmentDocumentType
+    {
+        return $this->type;
+    }
+
+    public function setType(ShipmentDocumentType $type): static
+    {
+        $this->type = $type;
 
         return $this;
     }

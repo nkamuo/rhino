@@ -27,8 +27,8 @@ class Uploader implements UploaderInterface
 
     public function __construct(
         ParameterBagInterface $parameters,
-        AssetExtension $assetsHelper,
-        HttpFoundationExtension $httpHelper,
+        // AssetExtension $assetsHelper,
+        // HttpFoundationExtension $httpHelper,
         SluggerInterface $slugger,
         // private Filesystem $filesystem,
         private FilesystemOperator $defaultStorage,
@@ -37,8 +37,8 @@ class Uploader implements UploaderInterface
         )
     {
         $this->parameters = $parameters;
-        $this->assetsHelper = $assetsHelper;
-        $this->httpHelper = $httpHelper;
+        // $this->assetsHelper = $assetsHelper;
+        // $this->httpHelper = $httpHelper;
         $this->slugger = $slugger;
 
 

@@ -20,11 +20,11 @@ class ShipmentDocumentAttachment
     private ?Ulid $id = null;
 
     #[GQL\Field()]
-    #[ORM\Column(length: 32)]
-    private ?string $type = null;
+    #[ORM\Column(length: 32, enumType: ShipmentDocumentAttachmentType::class)]
+    private ?ShipmentDocumentAttachmentType $type = null;
 
     #[GQL\Field()]
-    #[ORM\Column(length: 64)]
+    #[ORM\Column(length: 225)]
     private ?string $src = null;
 
     #[GQL\Field()]
@@ -45,12 +45,12 @@ class ShipmentDocumentAttachment
         return $this->id;
     }
 
-    public function getType(): ?string
+    public function getType(): ?ShipmentDocumentAttachmentType
     {
         return $this->type;
     }
 
-    public function setType(string $type): static
+    public function setType(ShipmentDocumentAttachmentType $type): static
     {
         $this->type = $type;
 

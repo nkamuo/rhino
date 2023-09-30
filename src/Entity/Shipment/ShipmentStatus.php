@@ -9,6 +9,9 @@ enum ShipmentStatus: string{
     case PUBLISHED = 'PUBLISHED';
     case CANCELLED = 'CANCELLED';
     case PROCESSING = 'PROCESSING';
+    
+    case INTRANSIT = 'INTRANSIT';
+    case DELIVERED = 'DELIVERED';
     case ACTIVE = 'ACTIVE';
     case COMPLETED = 'COMPLETED';
 }

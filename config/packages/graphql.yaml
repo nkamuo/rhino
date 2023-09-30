@@ -15,7 +15,7 @@ overblog_graphql:
             driver:
                 query: DriverQuery
                 mutation: DriverMutation
-                
+
             admin:
                 query: AdminQuery
                 mutation: AdminMutation
@@ -32,4 +32,8 @@ overblog_graphql:
 
                 - type: attribute
                   dir: "%kernel.project_dir%/src/GraphQL"
+                  suffix: null
+
+                - type: attribute
+                  dir: "%kernel.project_dir%/src/CQRS"
                   suffix: null

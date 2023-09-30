@@ -3,13 +3,21 @@
 namespace App\GraphQL\Shipment\Resolver;
 
 use App\Entity\Account\User;
+use App\Entity\Shipment\Document\ShipmentDocument;
+use App\Entity\Shipment\Document\ShipmentDocumentAttachment;
+use App\Entity\Shipment\Shipment;
 use App\Entity\Shipment\ShipmentExecution;
 use App\Entity\Shipment\ShipmentExecutionStatus;
 use App\Entity\Shipment\ShipmentOrder;
 use App\Entity\Shipment\ShipmentOrderOrderStatus;
 use App\Entity\Shipment\ShipmentOrderStatus;
+use App\Entity\Shipment\ShipmentStatus;
 use App\Entity\Vehicle\Vehicle;
+use App\GraphQL\Shipment\Input\Document\ShipmentOrderAttachmentInput;
+use App\GraphQL\Shipment\Input\Document\ShipmentOrderDocumentInput;
 use App\GraphQL\Shipment\Input\ShipmentOrderBidCreationInput;
+use App\GraphQL\Shipment\Input\ShipmentOrderEstimatedNodeArrivalInput;
+use App\GraphQL\Shipment\Input\ShipmentOrderNodeExecutionInput;
 use App\GraphQL\Shipment\Type\ShipmentOrderConnection;
 use App\GraphQL\Shipment\Type\ShipmentOrderDriverBidConnection;
 use App\GraphQL\Shipment\Type\ShipmentOrderDriverBidEdge;
@@ -17,6 +25,7 @@ use App\GraphQL\Shipment\Type\ShipmentOrderEdge;
 use App\Repository\Shipment\ShipmentOrderDriverBidRepository;
 use App\Repository\Shipment\ShipmentOrderRepository;
 use App\Repository\Vehicle\VehicleRepository;
+use App\Service\File\UploaderInterface;
 use App\Service\Identity\CodeGeneratorInterface;
 use App\Util\Doctrine\QueryBuilderHelper;
 use DateTimeImmutable;
@@ -30,6 +39,7 @@ use Overblog\GraphQLBundle\Relay\Connection\PageInfoInterface;
 use Overblog\GraphQLBundle\Relay\Connection\Paginator;
 use Symfony\Bridge\Doctrine\Types\UlidType;
 use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Uid\Ulid;
 
 
@@ -46,6 +56,7 @@ class DriverShipmentOrderResolver
         private CodeGeneratorInterface $codeGenerator,
         private VehicleRepository $vehicleRepository,
         private Security $security,
+        private UploaderInterface $uploader,
     ) {
     }
 
@@ -94,7 +105,7 @@ class DriverShipmentOrderResolver
 
         $qb = $this->shipmentOrderRepository->createQueryBuilder('_order');
 
-        
+
         $qb
             ->innerJoin('_order.driver', 'driver')
             ->andWhere("driver.id = :driver")
@@ -118,7 +129,7 @@ class DriverShipmentOrderResolver
 
 
 
-    
+
 
     #[GQL\Mutation()]
     #[GQL\Arg(name: 'id', type: 'Ulid!')]
@@ -128,7 +139,7 @@ class DriverShipmentOrderResolver
         $order = $this->getDriverShipmentOrder($id);
         $shipment = $order->getShipment();
 
-        
+
         if (($status = $order->getExecution()) != null) {
             throw new UserError(sprintf("This shipment order execution is already \"%s\"", $status->getStatus()->value));
         }
@@ -143,13 +154,11 @@ class DriverShipmentOrderResolver
         $execution
             ->setCode($code)
             ->setVehicle($order->getVehicle())
-            ->setDriver($driver)
-            ;
+            ->setDriver($driver);
 
         $execution
             ->addOrder($order)
-            ->setStatus(ShipmentExecutionStatus::PROCESSING)
-            ;
+            ->setStatus(ShipmentExecutionStatus::PROCESSING);
         $order->setStatus(ShipmentOrderStatus::PROCESSING);
 
         $this->entityManager->persist($execution);
@@ -159,7 +168,150 @@ class DriverShipmentOrderResolver
     }
 
 
-    
+
+    #[GQL\Mutation()]
+    #[GQL\Arg(name: 'id', type: 'Ulid!')]
+    #[GQL\Arg(name: 'input', type: 'ShipmentOrderEstimatedNodeArrivalInput!')]
+    public function updateShipmentOrderEstimatedPickup(Ulid $id, ShipmentOrderEstimatedNodeArrivalInput $input): ShipmentOrder
+    {
+        $order = $this->getDriverShipmentOrder($id);
+
+        if (($status = $order->getExecution()) == null) {
+            throw new UserError(sprintf("This shipment order execution is not started yet"));
+        }
+
+        $order
+            ->setExpectedPickupAt($input->datetime);
+        $this->entityManager->persist($order);
+        $this->entityManager->flush();
+
+        return $order;
+    }
+
+
+
+    #[GQL\Mutation()]
+    #[GQL\Arg(name: 'id', type: 'Ulid!')]
+    #[GQL\Arg(name: 'input', type: 'ShipmentOrderEstimatedNodeArrivalInput!')]
+    public function updateShipmentOrderEstimatedDelivery(Ulid $id, ShipmentOrderEstimatedNodeArrivalInput $input): ShipmentOrder
+    {
+        $order = $this->getDriverShipmentOrder($id);
+
+        if (($status = $order->getExecution()) == null) {
+            throw new UserError(sprintf("This shipment order execution is not started yet"));
+        }
+
+        $order
+            ->setExpectedDeliveryAt($input->datetime);
+        $this->entityManager->persist($order);
+        $this->entityManager->flush();
+
+        return $order;
+    }
+
+
+
+    #[GQL\Mutation()]
+    #[GQL\Arg(name: 'id', type: 'Ulid!')]
+    #[GQL\Arg(name: 'input', type: 'ShipmentOrderNodeExecutionInput!')]
+    public function executeShipmentOrderPickup(Ulid $id, ShipmentOrderNodeExecutionInput $input): ShipmentOrder
+    {
+        $order = $this->getDriverShipmentOrder($id);
+        $shipment = $order->getShipment();
+
+        if (($status = $order->getExecution()) == null) {
+            throw new UserError(sprintf("This shipment order execution is not started yet"));
+        }
+
+        if (($status = $order->getStatus()) != ShipmentOrderStatus::PROCESSING) {
+            throw new UserError(sprintf("This shipment order is not in \"%s\" state yet. Currently \"\%s\"", ShipmentOrderStatus::PROCESSING->name, $status->name));
+        }
+
+        $document = $this->handleDocument(
+            shipment: $shipment,
+            input: $input->document,
+        );
+        $order->setPickupConfirmation($document);
+        $order->setStatus(ShipmentOrderStatus::INTRANSIT);
+        $shipment->setStatus(ShipmentStatus::INTRANSIT);
+
+        $this->entityManager->persist($shipment);
+        $this->entityManager->flush();
+
+        return $order;
+    }
+
+
+
+    #[GQL\Mutation()]
+    #[GQL\Arg(name: 'id', type: 'Ulid!')]
+    #[GQL\Arg(name: 'input', type: 'ShipmentOrderNodeExecutionInput!')]
+    public function executeShipmentOrderDelivery(Ulid $id, ShipmentOrderNodeExecutionInput $input): ShipmentOrder
+    {
+        $order = $this->getDriverShipmentOrder($id);
+        $shipment = $order->getShipment();
+
+        if (($status = $order->getExecution()) == null) {
+            throw new UserError(sprintf("This shipment order execution is not started yet"));
+        }
+
+        if (($status = $order->getStatus()) != ShipmentOrderStatus::INTRANSIT) {
+            throw new UserError(sprintf("This shipment order is not in \"%s\" state yet. Currently \"\%s\"", ShipmentOrderStatus::INTRANSIT->name, $status->name));
+        }
+
+        $document = $this->handleDocument(
+            shipment: $shipment,
+            input: $input->document,
+        );
+        $order->setProofOfDelivery($document);
+        $order->setStatus(ShipmentOrderStatus::DELIVERED);
+        $shipment->setStatus(ShipmentStatus::INTRANSIT);
+
+        $this->entityManager->persist($order);
+        $this->entityManager->flush();
+
+        return $order;
+    }
+
+
+
+    private function handleDocument(Shipment $shipment, ShipmentOrderDocumentInput $input): ShipmentDocument
+    {
+
+        $document = new ShipmentDocument();
+        $document
+            ->setType($input->type)
+            ->setMeta($input->meta);
+        foreach ($input->attachments as $aInput) {
+            $attachment = $this->handleDocumentAttachment(shipment: $shipment, input: $aInput);
+            $document->addAttachment($attachment);
+        }
+        return $document;
+    }
+
+
+
+    private function handleDocumentAttachment(Shipment $shipment, ShipmentOrderAttachmentInput $input): ShipmentDocumentAttachment
+    {
+        $uri = $this->handleFileUpload(shipment: $shipment, file: $input->src);
+        $attachment = new ShipmentDocumentAttachment();
+        $attachment
+            ->setType($input->type)
+            ->setSrc($uri)
+            ->setCaption($input->caption)
+            ->setMeta($input->meta);
+        return $attachment;
+    }
+
+
+    private function handleFileUpload(Shipment $shipment,  UploadedFile $file)
+    {
+        $path = sprintf('shipment/%s/documents/attachments', $shipment->getCode());
+        $uri = $this->uploader->upload($file, $path);
+        return $uri;
+    }
+
+
     private function getDriverShipmentOrder(Ulid $id): ShipmentOrder
     {
         $order = $this->shipmentOrderRepository->find($id);
@@ -189,9 +341,10 @@ class DriverShipmentOrderResolver
     }
 
 
-    private function getShipmentOrderById(Ulid $id): ShipmentOrder{
+    private function getShipmentOrderById(Ulid $id): ShipmentOrder
+    {
         $shipment = $this->shipmentOrderRepository->find($id);
-        if(null == $shipment){
+        if (null == $shipment) {
             throw new UserError("Cannot find shipment with [id: {$id}]");
         }
         return $shipment;

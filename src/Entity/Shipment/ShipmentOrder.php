@@ -45,7 +45,7 @@ class ShipmentOrder
     private ?ShipmentDriverBid $bid = null;
 
     #[GQL\Field()]
-    #[ORM\Column(length: 32, enumType:ShipmentOrderStatus::class)]
+    #[ORM\Column(length: 32, enumType: ShipmentOrderStatus::class)]
     private ShipmentOrderStatus $status = ShipmentOrderStatus::PENDING;
 
     #[GQL\Field(type: 'DateTime')]
@@ -121,12 +121,17 @@ class ShipmentOrder
     #[ORM\OneToOne(cascade: ['persist', 'remove'])]
     private ?ShipmentDocument $proofOfDelivery = null;
 
+    #[GQL\Field(type:'[ShipmentDocument!]!')]
+    #[ORM\ManyToMany(targetEntity: ShipmentDocument::class, cascade:['persist', 'remove'])]
+    private Collection $documents;
+
 
     public function __construct()
     {
         $this->createdAt = new \DateTimeImmutable();
         $this->activities = new ArrayCollection();
         $this->charges = new ArrayCollection();
+        $this->documents = new ArrayCollection();
     }
     public function getId(): ?Ulid
     {
@@ -422,6 +427,14 @@ class ShipmentOrder
 
     public function setPickupConfirmation(?ShipmentDocument $pickupConfirmation): static
     {
+        $crnt = $this->pickupConfirmation;
+        if (!($pickupConfirmation)) {
+            if ($crnt)
+                $this->removeDocument($crnt);
+        } else {
+            $this->addDocument($pickupConfirmation);
+        }
+
         $this->pickupConfirmation = $pickupConfirmation;
 
         return $this;
@@ -434,7 +447,39 @@ class ShipmentOrder
 
     public function setProofOfDelivery(?ShipmentDocument $proofOfDelivery): static
     {
+        $crnt = $this->proofOfDelivery;
+        if (!($proofOfDelivery)) {
+            if ($crnt)
+                $this->removeDocument($crnt);
+        } else {
+            $this->addDocument($proofOfDelivery);
+        }
+
         $this->proofOfDelivery = $proofOfDelivery;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, ShipmentDocument>
+     */
+    public function getDocuments(): Collection
+    {
+        return $this->documents;
+    }
+
+    public function addDocument(ShipmentDocument $document): static
+    {
+        if (!$this->documents->contains($document)) {
+            $this->documents->add($document);
+        }
+
+        return $this;
+    }
+
+    public function removeDocument(ShipmentDocument $document): static
+    {
+        $this->documents->removeElement($document);
 
         return $this;
     }

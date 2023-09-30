@@ -1,0 +1,170 @@
+<?php
+
+
+
+// SubjectType entity
+class SubjectType {
+    /**
+     * @ORM\Id()
+     * @ORM\GeneratedValue()
+     * @ORM\Column(type="integer")
+     */
+    private $id;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $name;
+
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\Subject", mappedBy="subjectType")
+     */
+    private $subjects;
+
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\Role", mappedBy="subjectType")
+     */
+    private $roles;
+
+    public function __construct()
+    {
+        $this->subjects = new ArrayCollection();
+        $this->roles = new ArrayCollection();
+    }
+
+    // getters and setters
+}
+
+// Subject entity
+class Subject {
+    /**
+     * @ORM\Id()
+     * @ORM\GeneratedValue()
+     * @ORM\Column(type="integer")
+     */
+    private $id;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $name;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\SubjectType", inversedBy="subjects")
+     */
+    private $subjectType;
+
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\UserPermission", mappedBy="subject")
+     */
+    private $userPermissions;
+
+    public function __construct()
+    {
+        $this->userPermissions = new ArrayCollection();
+    }
+
+    // getters and setters
+}
+
+// Role entity
+class Role {
+    /**
+     * @ORM\Id()
+     * @ORM\GeneratedValue()
+     * @ORM\Column(type="integer")
+     */
+    private $id;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $name;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\SubjectType", inversedBy="roles")
+     */
+    private $subjectType;
+
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\ConsumerRoleAssignment", mappedBy="role")
+     */
+    private $consumerRoleAssignments;
+
+    public function __construct()
+    {
+        $this->consumerRoleAssignments = new ArrayCollection();
+    }
+
+    // getters and setters
+}
+
+// Permission entity
+class Permission {
+    /**
+     * @ORM\Id()
+     * @ORM\GeneratedValue()
+     * @ORM\Column(type="integer")
+     */
+    private $id;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $name;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $operation;
+
+    /**
+     * @ORM\ManyToMany(targetEntity="App\Entity\Role", inversedBy="permissions")
+     */
+    private $roles;
+
+    /**
+     * @ORM\ManyToMany(targetEntity="App\Entity\PermissionConsumer", inversedBy="permissions")
+     */
+    private $permissionConsumers;
+
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\UserPermission", mappedBy="permission")
+     */
+    private $userPermissions;
+
+    public function __construct()
+    {
+        $this->roles = new ArrayCollection();
+        $this->permissionConsumers = new ArrayCollection();
+        $this->userPermissions = new ArrayCollection();
+    }
+
+    // getters and setters
+}
+
+// PermissionConsumer entity
+class PermissionConsumer {
+    /**
+     * @ORM\Id()
+     * @ORM\GeneratedValue()
+     * @ORM\Column(type="integer")
+     */
+    private $id;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $name;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $type;
+
+    /**
+     * @ORM\OneToMany
+     * 
+     */
+
+}
