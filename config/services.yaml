@@ -38,6 +38,6 @@ services:
                 '@App\Service\Geometery\GeometryEngineProvider',
                 "getGeometryEngine",
             ]
-
+    League\Flysystem\MountManager: '@oneup_flysystem.mount_manager'
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones

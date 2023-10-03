@@ -5,15 +5,21 @@ namespace App\GraphQL\Shipment\Resolver;
 use App\Entity\Account\User;
 use App\Entity\Addressing\UserAddress;
 use App\Entity\Catalog\UserProduct;
+use App\Entity\Shipment\Assessment\Review;
+use App\Entity\Shipment\Assessment\UnitReview;
 use App\Entity\Shipment\Shipment;
 use App\Entity\Shipment\ShipmentBidStatus;
 use App\Entity\Shipment\ShipmentDriverBid;
 use App\Entity\Shipment\ShipmentItem;
 use App\Entity\Shipment\ShipmentOrder;
 use App\Entity\Shipment\ShipmentStatus;
+use App\GraphQL\Shipment\Input\Assessment\ShipmentOrderReviewInput;
 use App\GraphQL\Shipment\Input\ShipmentCreationInput;
 use App\GraphQL\Shipment\Input\ShipmentItemInput;
+use App\GraphQL\Shipment\Input\ShipmentPublicationInput;
 use App\GraphQL\Shipment\Type\ShipmentConnection;
+use App\GraphQL\Shipment\Type\ShipmentDriverBidConnection;
+use App\GraphQL\Shipment\Type\ShipmentDriverBidEdge;
 use App\GraphQL\Shipment\Type\ShipmentEdge;
 use App\Repository\Addressing\UserAddressRepository;
 use App\Repository\Catalog\UserProductRepository;
@@ -199,6 +205,142 @@ class ClientShipmentResolver
 
 
 
+
+
+
+    #[GQL\Mutation()]
+    #[GQL\Arg(name: 'id', type: 'Ulid!')]
+    #[GQL\Arg(name: 'input', type: 'ShipmentPublicationInput')]
+    public function publishShipment(Ulid $id, ?ShipmentPublicationInput $input): Shipment
+    {
+        $user = $this->getUser();
+        $shipment = $this->getUserShipment($id, $user);
+
+        if ($shipment->getStatus() != ShipmentStatus::PENDING) {
+            $message = sprintf(
+                "Only \"%s\" Shipments can be published. Shipment is in the \"%s\" state",
+                ShipmentStatus::PENDING->name,
+                $shipment->getStatus()?->name
+            );
+            throw new UserError($message);
+        }
+
+        if ($budget = $input?->budget) {
+            $shipment->setBudget($budget->toInstance());
+        }
+        $shipment->setStatus(ShipmentStatus::PUBLISHED);
+
+        $this->entityManager->persist($shipment);
+        $this->entityManager->flush();
+
+        return $shipment;
+    }
+
+
+
+
+    #[GQL\Mutation()]
+    #[GQL\Arg(name: 'id', type: 'Ulid!')]
+    #[GQL\Arg(name: 'input', type: 'ShipmentOrderReviewInput')]
+    public function reviewShipment(Ulid $id, ?ShipmentOrderReviewInput $input): Shipment
+    {
+        $user = $this->getUser();
+        $shipment = $this->getUserShipment($id, $user);
+
+        if ($shipment->getStatus() != ShipmentStatus::DELIVERED) {
+            $message = sprintf(
+                "Only \"%s\" Shipments can be published. Shipment is in the \"%s\" state",
+                ShipmentStatus::DELIVERED->name,
+                $shipment->getStatus()?->name
+            );
+            throw new UserError($message);
+        }
+
+        $review = new Review();
+        $review->setDescription($input->description);
+        
+        foreach ($input->unitReviews as $uRevInputs) {
+            $unitReview = new UnitReview();
+            $unitReview
+                ->setRating($uRevInputs->rating)
+                ->setDescription($uRevInputs->description);
+            $review->addUnitReview($unitReview);
+        }
+        $shipment->setStatus(ShipmentStatus::COMPLETED);
+
+        $this->entityManager->persist($shipment);
+        $this->entityManager->flush();
+
+        return $shipment;
+    }
+
+
+
+
+
+
+
+    /////////////////////////////////////////
+    // SHIPMENT BIDDING AND LISTING FROM HERE
+    /////////////////////////////////
+
+
+    #[Query(name: "get_shipment_bid_item",)]
+    #[GQL\Arg(
+        name: 'id',
+        type: 'Ulid'
+    )]
+    public function getShipmentBidItem(
+        #[GQL\Arg(type: 'Ulid')] Ulid $id
+    ): ShipmentDriverBid {
+        $bid = $this->getUserShipmentBid($id);
+        return $bid;
+    }
+
+
+    #[GQL\Query(name: "get_shipment_bid_list")]
+    // #[GQL\Access("isGranted('ROLE_USER')")]
+    public function getShipmentDriverBidConnection(
+        ?int $first,
+        ?String $after,
+        ?String $filter,
+        ?String $sort,
+    ): ShipmentDriverBidConnection {
+
+        $cb = new ConnectionBuilder(
+            null,
+            fn ($edges, PageInfoInterface $pageInfo) => new ShipmentDriverBidConnection($edges, $pageInfo),
+            fn (string $coursor, ShipmentDriverBid $bid, int $index) => new ShipmentDriverBidEdge($coursor, $bid)
+        );
+
+        $qb = $this->shipmentDriverBidRepository->createQueryBuilder('bid');
+
+        QueryBuilderHelper::applyCriteria($qb, $filter, 'bid');
+
+        $user = $this->getUser();
+
+        $qb
+            ->innerJoin('bid.shipment', 'shipment')
+            ->innerJoin('shipment.owner', 'owner')
+            ->andWhere("owner.id = :owner")
+            ->setParameter("owner", $user->getId(), UlidType::NAME);
+
+        $total = fn () => (int) (clone $qb)->select('COUNT(bid.id)')->getQuery()->getSingleScalarResult();
+
+        $paginator = new Paginator(function (?int $offset, ?int $limit) use ($qb) {
+            return $qb
+                ->setFirstResult($offset)
+                ->setMaxResults($limit)
+                ->getQuery()
+                ->getResult();
+        }, false, $cb);
+
+        return $paginator->auto(new Argument(['first' => $first, 'after' => $after]), $total);
+    }
+
+
+
+
     #[GQL\Mutation()]
     #[GQL\Arg(name: 'id', type: 'Ulid!')]
     public function acceptShipmentBid(Ulid $id): ShipmentOrder
@@ -207,7 +349,7 @@ class ClientShipmentResolver
         $bid = $this->getUserShipmentBid($id);
         $shipment = $bid->getShipment();
 
-        
+
         if ($shipment->getShipmentOrder() != null) {
             throw new UserError("This shipment already has an order");
         }
@@ -233,14 +375,11 @@ class ClientShipmentResolver
             ->setCurrency($currency)
             ->setSubtotal($amount)
             ->setPickupAt($bid->getPickupAt() ?? $shipment->getPickupAt())
-            ->setDeliveryAt($bid->getDeliveryAt() ?? $shipment->getDeliveryAt())
-
-            ;
+            ->setDeliveryAt($bid->getDeliveryAt() ?? $shipment->getDeliveryAt());
 
         $shipment
             ->setShipmentOrder($order)
-            ->setStatus(ShipmentStatus::PROCESSING)
-            ;
+            ->setStatus(ShipmentStatus::PROCESSING);
         $bid->setStatus(ShipmentBidStatus::ACCEPTED);
 
         $this->entityManager->persist($shipment);
@@ -251,7 +390,7 @@ class ClientShipmentResolver
 
 
 
-    
+
 
     #[GQL\Mutation()]
     #[GQL\Arg(name: 'id', type: 'Ulid!')]
@@ -261,7 +400,7 @@ class ClientShipmentResolver
         $bid = $this->getUserShipmentBid($id);
         $shipment = $bid->getShipment();
 
-        
+
         if ($shipment->getShipmentOrder()?->getBid() == $bid) {
             throw new UserError("This shipment bid already has an order");
         }

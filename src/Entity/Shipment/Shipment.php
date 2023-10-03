@@ -99,6 +99,7 @@ class Shipment
     )]
     private ?int $totalWeight = null;
 
+    #[GQL\Field()]
     #[ORM\OneToOne(mappedBy: 'shipment', cascade: ['persist', 'remove'])]
     private ?ShipmentOrder $shipmentOrder = null;
 
@@ -191,6 +192,7 @@ class Shipment
             $this->items->add($item);
             $item->setShipment($this);
         }
+        $this->calculateWeight();
 
         return $this;
     }
@@ -203,7 +205,7 @@ class Shipment
                 $item->setShipment(null);
             }
         }
-
+        $this->calculateWeight();
         return $this;
     }
 
@@ -342,6 +344,7 @@ class Shipment
                 $weight += $iWeight;
             }
         }
+        $this->setTotalWeight($weight);
         return $weight;
     }
 

@@ -23,7 +23,7 @@ class ShipmentDocumentAttachment
     #[ORM\Column(length: 32, enumType: ShipmentDocumentAttachmentType::class)]
     private ?ShipmentDocumentAttachmentType $type = null;
 
-    #[GQL\Field()]
+    #[GQL\Field(type:'FileURI')]
     #[ORM\Column(length: 225)]
     private ?string $src = null;
 

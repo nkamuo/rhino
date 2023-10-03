@@ -265,7 +265,7 @@ class DriverShipmentOrderResolver
         );
         $order->setProofOfDelivery($document);
         $order->setStatus(ShipmentOrderStatus::DELIVERED);
-        $shipment->setStatus(ShipmentStatus::INTRANSIT);
+        $shipment->setStatus(ShipmentStatus::DELIVERED);
 
         $this->entityManager->persist($order);
         $this->entityManager->flush();

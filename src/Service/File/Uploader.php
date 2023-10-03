@@ -5,6 +5,8 @@ namespace App\Service\File;
 use InvalidArgumentException;
 use League\Flysystem\Filesystem;
 use League\Flysystem\FilesystemOperator;
+use League\Flysystem\MountManager;
+// use League\Flysystem\Filesystem;
 use Symfony\Bridge\Twig\Extension\AssetExtension;
 use Symfony\Bridge\Twig\Extension\HttpFoundationExtension;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
@@ -14,6 +16,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Component\String\PathString;
 
+// \Overblog\GraphQLBundle\Upload\Type\GraphQLUploadType::class;
 class Uploader implements UploaderInterface
 {
 
@@ -31,7 +34,8 @@ class Uploader implements UploaderInterface
         // HttpFoundationExtension $httpHelper,
         SluggerInterface $slugger,
         // private Filesystem $filesystem,
-        private FilesystemOperator $defaultStorage,
+        private Filesystem $defaultStorage,
+        private MountManager $mountManager,
         private UrlGeneratorInterface $urlGenerator,
         // private Filesystem $filesystem,
         )
@@ -42,6 +46,8 @@ class Uploader implements UploaderInterface
         $this->slugger = $slugger;
 
 
+
+        // $this->defaultStorage->temporaryUrl()
 
 
         // /** @AssetExtension */
@@ -73,14 +79,22 @@ class Uploader implements UploaderInterface
         $uploadDir = $absoluteUploadDir;
 
         // $this->assetsHelper-
+
+        $prefix = 'local://';
         
         $uploadDir = ($uploadDir?? '') . '/' . $path;
 
         $filePath = $uploadDir . '/' .$newName;
         $filePath = preg_replace(['~/+~','~^/|/$~'],['/',''],$filePath);
 
+        $filePath = "{$prefix}".$filePath;
         
-        $this->defaultStorage->write($filePath,$file->getContent());
+        $this->mountManager->write($filePath,$file->getContent());
+
+        // $mount = $this->defaultStorage->
+        
+        // $filesystem = $this->mountManager->
+        // $this->defaultStorage->write($filePath,$file->getContent());
 
         // $this->filesystem->publicUrl();
 

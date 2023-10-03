@@ -21,7 +21,7 @@ class ChatMessageAttachment
     #[GQL\Field()]
     #[ORM\ManyToOne(inversedBy: 'attachments')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?ChatMessage $message = null;
+    private ?AbstractMessage $message = null;
 
     #[GQL\Field()]
     #[ORM\Column(length: 255)]
@@ -40,12 +40,12 @@ class ChatMessageAttachment
         return $this->id;
     }
 
-    public function getMessage(): ?ChatMessage
+    public function getMessage(): ?AbstractMessage
     {
         return $this->message;
     }
 
-    public function setMessage(?ChatMessage $message): self
+    public function setMessage(?AbstractMessage $message): self
     {
         $this->message = $message;
 

@@ -4,6 +4,7 @@ namespace App\Entity\Shipment;
 
 use App\Entity\Account\Driver;
 use App\Entity\Account\User;
+use App\Entity\Shipment\Assessment\Review;
 use App\Entity\Shipment\Document\ShipmentDocument;
 use App\Entity\Vehicle\Vehicle;
 use App\Repository\Shipment\ShipmentOrderRepository;
@@ -124,6 +125,9 @@ class ShipmentOrder
     #[GQL\Field(type:'[ShipmentDocument!]!')]
     #[ORM\ManyToMany(targetEntity: ShipmentDocument::class, cascade:['persist', 'remove'])]
     private Collection $documents;
+
+    #[ORM\OneToOne(cascade: ['persist', 'remove'])]
+    private ?Review $review = null;
 
 
     public function __construct()
@@ -480,6 +484,18 @@ class ShipmentOrder
     public function removeDocument(ShipmentDocument $document): static
     {
         $this->documents->removeElement($document);
+
+        return $this;
+    }
+
+    public function getReview(): ?Review
+    {
+        return $this->review;
+    }
+
+    public function setReview(?Review $review): static
+    {
+        $this->review = $review;
 
         return $this;
     }
