@@ -27,7 +27,7 @@ class ShipmentDocument
     private Collection $attachments;
 
     #[GQL\Field()]
-    #[ORM\OneToOne(mappedBy: 'pickupConfirmation', cascade: ['persist', 'remove'])]
+    #[ORM\ManyToOne(inversedBy: 'documents', cascade: ['persist', 'remove'])]
     private ?ShipmentOrder $shipmentOrder = null;
 
     #[GQL\Field(type: 'Json')]
@@ -85,15 +85,15 @@ class ShipmentDocument
 
     public function setShipmentOrder(?ShipmentOrder $shipmentOrder): static
     {
-        // unset the owning side of the relation if necessary
-        if ($shipmentOrder === null && $this->shipmentOrder !== null) {
-            $this->shipmentOrder->setPickupConfirmation(null);
-        }
+        // // unset the owning side of the relation if necessary
+        // if ($shipmentOrder === null && $this->shipmentOrder !== null) {
+        //     $this->shipmentOrder->setPickupConfirmation(null);
+        // }
 
-        // set the owning side of the relation if necessary
-        if ($shipmentOrder !== null && $shipmentOrder->getPickupConfirmation() !== $this) {
-            $shipmentOrder->setPickupConfirmation($this);
-        }
+        // // set the owning side of the relation if necessary
+        // if ($shipmentOrder !== null && $shipmentOrder->getPickupConfirmation() !== $this) {
+        //     $shipmentOrder->setPickupConfirmation($this);
+        // }
 
         $this->shipmentOrder = $shipmentOrder;
 

@@ -122,12 +122,16 @@ class ShipmentOrder
     #[ORM\OneToOne(cascade: ['persist', 'remove'])]
     private ?ShipmentDocument $proofOfDelivery = null;
 
-    #[GQL\Field(type:'[ShipmentDocument!]!')]
-    #[ORM\ManyToMany(targetEntity: ShipmentDocument::class, cascade:['persist', 'remove'])]
+    #[GQL\Field(type: '[ShipmentDocument!]!')]
+    #[ORM\OneToMany(mappedBy: 'shipmentOrder', targetEntity: ShipmentDocument::class, cascade: ['persist', 'remove'])]
     private Collection $documents;
 
     #[ORM\OneToOne(cascade: ['persist', 'remove'])]
     private ?Review $review = null;
+
+    #[GQL\Field()]
+    #[ORM\Column]
+    private ?int $documentsCount = 0;
 
 
     public function __construct()
@@ -477,15 +481,24 @@ class ShipmentOrder
         if (!$this->documents->contains($document)) {
             $this->documents->add($document);
         }
+        $document->setShipmentOrder($this);
+        $this->updatedDocumentCount();
 
         return $this;
     }
 
     public function removeDocument(ShipmentDocument $document): static
     {
-        $this->documents->removeElement($document);
+        if ($this->documents->removeElement($document)) {
+            $document->setShipmentOrder(null);
+        }
+        $this->updatedDocumentCount();
 
         return $this;
+    }
+
+    public function updatedDocumentCount(){
+        $this->documentsCount = $this->documents->count();
     }
 
     public function getReview(): ?Review
@@ -499,4 +512,10 @@ class ShipmentOrder
 
         return $this;
     }
+
+    public function getDocumentsCount(): ?int
+    {
+        return $this->documentsCount;
+    }
+
 }

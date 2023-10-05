@@ -5,7 +5,7 @@ use App\Message\Chat\Message\CountChatMessage;
 use App\Message\Chat\Message\FindChatMessageById;
 use App\Message\Chat\Message\SearchChatMessage;
 use App\Repository\Chat\ChatMessageRepository;
-use App\Util\Doctrine\QueryBuilderUtil;
+use App\Util\Doctrine\QueryBuilderHelper;
 use Symfony\Bridge\Doctrine\Types\UlidType;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
@@ -28,8 +28,8 @@ class ChatMessageQueryHandler{
 
         $qb = $this->repository->createQueryBuilder('chat_message');
      
-        QueryBuilderUtil::applyCriteria($qb, $search->getFilter(), 'chat_message');
-        QueryBuilderUtil::enableQueryCache($qb);
+        QueryBuilderHelper::applyCriteria($qb, $search->getFilter(), 'chat_message');
+        QueryBuilderHelper::enableQueryCache($qb);
 
         if($channelId = $search->getChannelId()){
             $qb->andWhere('chat_message.channel = :channelId')
@@ -75,7 +75,7 @@ class ChatMessageQueryHandler{
            //TODO: ENSURE THAT ONLY MESSAGES READABLE BY THIS PARTICIPANT IS ALLOWED
         }
         
-        QueryBuilderUtil::applyCriteria($qb, $search->getFilter(), 'chat_message');
+        QueryBuilderHelper::applyCriteria($qb, $search->getFilter(), 'chat_message');
         
         return (int) $qb->select('COUNT(chat_message.id)')->getQuery()->getSingleScalarResult();
     }

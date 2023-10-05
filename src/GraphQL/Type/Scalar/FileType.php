@@ -30,12 +30,16 @@ class FileType extends ScalarType
      */
     public function serialize($value): mixed
     {
-        $anHour = new \DateInterval('PT1H');
-        $expires = now()->add($anHour);
-        if (preg_match('~^\w+:\/\/~i', $value)) {
-            return $this->mountManager->temporaryUrl($value, $expires);
-        }
-        return $this->filesystem->temporaryUrl($value, $expires);
+        // $anHour = new \DateInterval('PT1H');
+        // $expires = now()->add($anHour);
+        // if (preg_match('~^\w+:\/\/~i', $value)) {
+        //     return $this->mountManager->publicUrl($value);
+        //     // return $this->mountManager->temporaryUrl($value, $expires);
+        // }
+        // return $this->filesystem->publicUrl($value);
+        // // return $this->filesystem->temporaryUrl($value, $expires);
+
+        return $value; 
     }
 
     /**

@@ -2,6 +2,8 @@
 
 namespace App\Util\Rsql;
 
+use App\Entity\Shipment\ShipmentOrderStatus;
+use App\Entity\Shipment\ShipmentStatus;
 use App\Util\Rsql\Operator\EqualTo;
 use App\Util\Rsql\Operator\GreaterThan;
 use App\Util\Rsql\Operator\GreaterThanOrEqualTo;
@@ -10,6 +12,7 @@ use App\Util\Rsql\Operator\LessThanOrEqualTo;
 use App\Util\Rsql\Operator\NotLike;
 use App\Util\Rsql\Operator\SameWeek;
 use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\QueryBuilder;
 // use Prettus\FIQLParser\Parser;
@@ -68,7 +71,8 @@ class RSQLHelper
             // die($criteria);
 
         } catch (\Throwable $e) {
-            throw new UserError($e->getMessage(), $e->getCode(), $e);
+            throw $e;
+            // throw new UserError($e->getMessage(), $e->getCode(), $e);
         }
 
         // $parser = new Parser();
@@ -207,8 +211,11 @@ class DoctrineQueryBuilder
             $rootName = '';
         } else {
             // $this->getOrJoinField($qb, $attrName);
-            list($rootName, $attrName, $type) = $this->getOrJoinField($qb, $attrName);
+            list($rootName, $attrName, $type, $rValue) = $this->getOrJoinField($qb, $attrName, $value);
             $rootName .= '.';
+            if ($rValue) {
+                $value = $rValue;
+            }
         }
 
         if (null !== $type) {
@@ -233,8 +240,11 @@ class DoctrineQueryBuilder
         }
 
 
-        if (in_array($type, ['date', 'time', 'datetime'])) {
+        if (in_array($type, ['date', 'time', 'datetime', Types::DATETIME_MUTABLE,])) {
             return  new \DateTime($value);
+        }
+        if (in_array($type, [Types::DATE_IMMUTABLE, Types::TIME_IMMUTABLE, Types::DATETIME_IMMUTABLE,])) {
+            return new \DateTimeImmutable($value);
         }
 
 
@@ -244,7 +254,7 @@ class DoctrineQueryBuilder
 
 
 
-    private function getOrJoinField(QueryBuilder $qb, string $path): mixed
+    private function getOrJoinField(QueryBuilder $qb, string $path, mixed $value): mixed
     {
 
         $em = $qb->getEntityManager();
@@ -274,9 +284,9 @@ class DoctrineQueryBuilder
             if ($levelMetadata->hasAssociation($segment)) {
 
                 if ($index >= ($size - 1)) {
-                    // throw new \InvalidArgumentException("Cannot use an association \"{$path}\" as a query field");
-                    $type = null;
-                    return [$parentAlias, $segment, $type];
+                    throw new \InvalidArgumentException("Cannot use an association \"{$path}\" as a query field");
+                    // $type = null;
+                    // return [$parentAlias, $segment, $type];
                 }
 
                 $associationMapping = $levelMetadata->getAssociationMapping($segment);
@@ -305,9 +315,36 @@ class DoctrineQueryBuilder
                     //     throw new \InvalidArgumentException("Invalid path \"{$path}\"");
                     $fieldMapping = $levelMetadata->getFieldMapping($segment);
                     // VarDumper::dump($fieldMapping);
+                    $fieldMapping = ((array) $fieldMapping);
+
+                    $enumValue = null;
+                    if (isset($fieldMapping['enumType'])) {
+                        $enumType = $fieldMapping['enumType'];
+
+                        $mCases = ShipmentOrderStatus::cases();
+
+                        $case = null;
+                        try {
+                            $case = $enumType::from($value);
+                        } catch (\Throwable $e) {
+                            $cases = [];
+                            foreach($enumType::cases() as $v){
+                                $cases[$v->name] = $v;
+                            }
+
+                            if (isset($cases[$value])) {
+                                $case = $cases[$value];
+                            } else {
+                                throw $e;
+                            }
+                        }
+
+                        $enumValue = $case->value;
+                    }
+
                     $type = ((array) $fieldMapping)['type'];
 
-                    return [$parentAlias, $segment, $type];
+                    return [$parentAlias, $segment, $type, $enumValue];
                 } else {
                     $targetEntity = $levelMetadata->getName();
                     throw new \InvalidArgumentException("RSQL-ERROR: \"{$targetEntity}\" has not field or association \"{$segment}\"");

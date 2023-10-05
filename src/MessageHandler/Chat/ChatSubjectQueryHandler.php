@@ -5,7 +5,7 @@ use App\Message\Chat\Subject\CountSubject;
 use App\Message\Chat\Subject\FindSubjectById;
 use App\Message\Chat\Subject\SearchSubject;
 use App\Repository\Chat\ChatSubjectRepository;
-use App\Util\Doctrine\QueryBuilderUtil;
+use App\Util\Doctrine\QueryBuilderHelper;
 use Symfony\Bridge\Doctrine\Types\UlidType;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
@@ -28,8 +28,8 @@ class ChatSubjectQueryHandler{
 
         $qb = $this->repository->createQueryBuilder('chat_subject');
      
-        QueryBuilderUtil::applyCriteria($qb, $search->getFilter(), 'chat_subject');
-        QueryBuilderUtil::enableQueryCache($qb);
+        QueryBuilderHelper::applyCriteria($qb, $search->getFilter(), 'chat_subject');
+        QueryBuilderHelper::enableQueryCache($qb);
 
         if($orderId = $search->getChannelId()){
             $qb->andWhere('chat_subject.channel = :channelId')
@@ -50,7 +50,7 @@ class ChatSubjectQueryHandler{
 
         $qb = $this->repository->createQueryBuilder('chat_subject');
 
-        QueryBuilderUtil::applyCriteria($qb, $search->getFilter(), 'chat_subject');
+        QueryBuilderHelper::applyCriteria($qb, $search->getFilter(), 'chat_subject');
         
         if($orderId = $search->getChannelId()){
             $qb->andWhere('chat_subject.channel = :channelId')

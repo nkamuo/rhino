@@ -3,6 +3,7 @@
 namespace App\Entity\Account;
 
 use App\Repository\Account\DriverRepository;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Overblog\GraphQLBundle\Annotation as GQL;
 use Symfony\Bridge\Doctrine\Types\UlidType;
@@ -26,7 +27,7 @@ class Driver
     #[GQL\Field()]
     #[ORM\Column(
         options: [
-            'default' => true
+            // 'default' => true
         ]
     )]
     private ?bool $verified = false;
@@ -42,6 +43,24 @@ class Driver
     #[GQL\Field(type: 'DateTime')]
     #[ORM\Column]
     private ?\DateTimeImmutable $createdAt = null;
+
+    #[GQL\Field()]
+    #[ORM\OneToOne(cascade: ['persist', 'remove'])]
+    private ?DriverAddress $address = null;
+
+    #[GQL\Field()]
+    #[ORM\Column(length: 32, nullable: true, enumType:Gender::class)]
+    private ?Gender $gender = null;
+
+    #[GQL\Field(type:'Date')]
+    #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
+    private ?\DateTimeInterface $dob = null;
+
+
+    public function __construct()
+    {
+        $this->createdAt = new \DateTimeImmutable();
+    }
 
     public function getId(): ?Ulid
     {
@@ -105,6 +124,42 @@ class Driver
     public function setCreatedAt(\DateTimeImmutable $createdAt): static
     {
         $this->createdAt = $createdAt;
+
+        return $this;
+    }
+
+    public function getAddress(): ?DriverAddress
+    {
+        return $this->address;
+    }
+
+    public function setAddress(?DriverAddress $address): static
+    {
+        $this->address = $address;
+
+        return $this;
+    }
+
+    public function getGender(): ?Gender
+    {
+        return $this->gender;
+    }
+
+    public function setGender(?Gender $gender): static
+    {
+        $this->gender = $gender;
+
+        return $this;
+    }
+
+    public function getDob(): ?\DateTimeInterface
+    {
+        return $this->dob;
+    }
+
+    public function setDob(?\DateTimeInterface $dob): static
+    {
+        $this->dob = $dob;
 
         return $this;
     }

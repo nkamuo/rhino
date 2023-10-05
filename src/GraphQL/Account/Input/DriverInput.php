@@ -3,40 +3,33 @@
 namespace App\GraphQL\Account\Input;
 
 use App\Entity\Account\Driver;
+use App\Entity\Account\DriverAddress;
+use App\Entity\Account\Gender;
 use Overblog\GraphQLBundle\Annotation as GQL;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[GQL\Input()]
 class DriverInput
 {
-    #[GQL\Field()]
-    public string $firstName;
+    #[GQL\Field(type: 'Date')]
+    public \DateTimeInterface $dob;
 
     #[GQL\Field()]
-    public string $lastName;
+    public ?Gender $gender;
 
     #[GQL\Field()]
-    public string $email;
-
-    #[GQL\Field()]
-    public string $phone;
-
-    #[GQL\Field()]
-    public string $password;
-
-    #[Assert\Choice(options: ['SHIPPER', 'TRUCKER'])]
-    #[GQL\Field()]
-    public ?string $type;
+    public ?DriverAddressInput $address;
 
     public function build(Driver $driver): void
     {
-        $driver
-            // ->setFirstName($this->firstName)
-            // ->setLastName($this->lastName)
-            // ->setEmail($this->email)
-            // ->setPhone($this->phone)
-            // ->setTitle($this->title)
-            // ->setDescription($this->description)
-        ;
+        if ($this->dob)
+            $driver->setDob($this->dob);
+        if ($this->gender)
+            $driver->setGender($this->gender);
+        if ($this->address) {
+            $address = $driver->getAddress() ?? new DriverAddress();
+            $this->address->build($address);
+            $driver->setAddress($address);
+        }
     }
 }

@@ -5,7 +5,7 @@ use App\Message\Chat\Participant\CountParticipant;
 use App\Message\Chat\Participant\FindParticipantById;
 use App\Message\Chat\Participant\SearchParticipant;
 use App\Repository\Chat\ChatParticipantRepository;
-use App\Util\Doctrine\QueryBuilderUtil;
+use App\Util\Doctrine\QueryBuilderHelper;
 use Symfony\Bridge\Doctrine\Types\UlidType;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
@@ -28,8 +28,8 @@ class ChatParticipantQueryHandler{
 
         $qb = $this->repository->createQueryBuilder('chat_participant');
      
-        QueryBuilderUtil::applyCriteria($qb, $search->getFilter(), 'chat_participant');
-        QueryBuilderUtil::enableQueryCache($qb);
+        QueryBuilderHelper::applyCriteria($qb, $search->getFilter(), 'chat_participant');
+        QueryBuilderHelper::enableQueryCache($qb);
 
         if($orderId = $search->getChannelId()){
             $qb->andWhere('chat_participant.channel = :channelId')
@@ -50,7 +50,7 @@ class ChatParticipantQueryHandler{
 
         $qb = $this->repository->createQueryBuilder('chat_participant');
 
-        QueryBuilderUtil::applyCriteria($qb, $search->getFilter(), 'chat_participant');
+        QueryBuilderHelper::applyCriteria($qb, $search->getFilter(), 'chat_participant');
         
         if($orderId = $search->getChannelId()){
             $qb->andWhere('chat_participant.channel = :channelId')

@@ -282,8 +282,12 @@ class DriverShipmentOrderResolver
         $document
             ->setType($input->type)
             ->setMeta($input->meta);
+
+
+        $path = sprintf('shipment/%s/%s', $shipment->getCode(), $input->type->name,);
         foreach ($input->attachments as $aInput) {
-            $attachment = $this->handleDocumentAttachment(shipment: $shipment, input: $aInput);
+            $uploadPath = sprintf('%s/%s', $path, $aInput->type->name);
+            $attachment = $this->handleDocumentAttachment(shipment: $shipment, uploadPath: $uploadPath, input: $aInput);
             $document->addAttachment($attachment);
         }
         return $document;
@@ -291,9 +295,9 @@ class DriverShipmentOrderResolver
 
 
 
-    private function handleDocumentAttachment(Shipment $shipment, ShipmentOrderAttachmentInput $input): ShipmentDocumentAttachment
+    private function handleDocumentAttachment(Shipment $shipment, String $uploadPath, ShipmentOrderAttachmentInput $input): ShipmentDocumentAttachment
     {
-        $uri = $this->handleFileUpload(shipment: $shipment, file: $input->src);
+        $uri = $this->handleFileUpload(shipment: $shipment, uploadPath: $uploadPath, file: $input->src);
         $attachment = new ShipmentDocumentAttachment();
         $attachment
             ->setType($input->type)
@@ -304,10 +308,9 @@ class DriverShipmentOrderResolver
     }
 
 
-    private function handleFileUpload(Shipment $shipment,  UploadedFile $file)
+    private function handleFileUpload(Shipment $shipment, String $uploadPath,   UploadedFile $file)
     {
-        $path = sprintf('shipment/%s/documents/attachments', $shipment->getCode());
-        $uri = $this->uploader->upload($file, $path);
+        $uri = $this->uploader->upload($file, $uploadPath);
         return $uri;
     }
 

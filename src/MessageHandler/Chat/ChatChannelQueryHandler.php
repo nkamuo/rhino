@@ -7,7 +7,7 @@ use App\Message\Chat\Channel\CountChannel;
 use App\Message\Chat\Channel\FindChannelById;
 use App\Message\Chat\Channel\SearchChannel;
 use App\Repository\Chat\ChatChannelRepository;
-use App\Util\Doctrine\QueryBuilderUtil;
+use App\Util\Doctrine\QueryBuilderHelper;
 use Doctrine\ORM\QueryBuilder;
 use Symfony\Bridge\Doctrine\Types\UlidType;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
@@ -82,8 +82,8 @@ class ChatChannelQueryHandler
 
         }
 
-        QueryBuilderUtil::applyCriteria($qb, $search->getFilter(), 'chat_channel');
-        QueryBuilderUtil::enableQueryCache($qb);
+        QueryBuilderHelper::applyCriteria($qb, $search->getFilter(), 'chat_channel');
+        QueryBuilderHelper::enableQueryCache($qb);
     }
 
 

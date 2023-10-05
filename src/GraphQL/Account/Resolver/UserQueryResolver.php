@@ -13,7 +13,10 @@ use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Uid\Ulid;
 
 
-#[GQL\Provider()]
+#[GQL\Provider(
+    targetQueryTypes: ['ClientQuery'],
+    targetMutationTypes: ['ClientMutation'],
+)]
 class UserQueryResolver
 {
 

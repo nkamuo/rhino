@@ -4,11 +4,13 @@ namespace App\GraphQL\Vehicle\Resolver;
 
 use App\Entity\Account\User;
 use App\Entity\Vehicle\Vehicle;
+use App\Entity\Vehicle\VehicleType;
 use App\GraphQL\Vehicle\Input\VehicleCreationInput;
 use App\GraphQL\Vehicle\Input\VehicleUpdateInput;
 use App\GraphQL\Vehicle\Type\VehicleConnection;
 use App\GraphQL\Vehicle\Type\VehicleEdge;
 use App\Repository\Vehicle\VehicleRepository;
+use App\Repository\Vehicle\VehicleTypeRepository;
 use App\Util\Doctrine\QueryBuilderHelper;
 use Doctrine\ORM\EntityManagerInterface;
 use Overblog\GraphQLBundle\Annotation as GQL;
@@ -32,6 +34,7 @@ class DriverVehicleResolver
 
     public function __construct(
         private VehicleRepository $vehicleRepository,
+        private VehicleTypeRepository $vehicleTypeRepository,
         private EntityManagerInterface $entityManager,
         private Security $security,
     ) {
@@ -61,7 +64,7 @@ class DriverVehicleResolver
         ?String $sort,
     ): VehicleConnection {
 
-       $driver = $this->getDriver();
+        $driver = $this->getDriver();
 
         $cb = new ConnectionBuilder(
             null,
@@ -98,9 +101,13 @@ class DriverVehicleResolver
     {
 
         $driver = $this->getDriver();
+        $type = $this->getVehicleTypeBydId($input->vehicleTypeId);
+        
         $vehicle = new Vehicle();
         $input->build($vehicle);
         $vehicle->setDriver($driver);
+        $vehicle->setType($type);
+
 
         $this->entityManager->persist($vehicle);
         $this->entityManager->flush();
@@ -124,9 +131,11 @@ class DriverVehicleResolver
     public function updateVehicle(Ulid $id,  VehicleUpdateInput $input): Vehicle
     {
         $vehicle = $this->getVehicleById($id);
-        $user = $this->getUser();
 
         $input->build($vehicle);
+
+        $type = $this->getVehicleTypeBydId($input->vehicleTypeId);
+        $vehicle->setType($type);
 
         $this->entityManager->persist($vehicle);
         $this->entityManager->flush();
@@ -169,5 +178,16 @@ class DriverVehicleResolver
             throw new UserError("Permission Denied: You may not perform this operation");
         }
         return $vehicle;
+    }
+
+
+
+    private function getVehicleTypeBydId(Ulid $id): VehicleType
+    {
+        $type = $this->vehicleTypeRepository->find($id);
+        if (null === $type) {
+            throw new UserError("Could not find Vehicle Type with [id:{$id}]");
+        }
+        return $type;
     }
 }

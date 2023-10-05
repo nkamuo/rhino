@@ -29,7 +29,7 @@ class AssessmentParameter
     private ?string $title = null;
 
     #[GQL\Field()]
-    #[ORM\Column(length: 32)]
+    #[ORM\Column(length: 64)]
     private ?string $subtitle = null;
 
     #[GQL\Field()]
