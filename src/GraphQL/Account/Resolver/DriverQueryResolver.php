@@ -5,6 +5,8 @@ namespace App\GraphQL\Account\Resolver;
 
 use App\Entity\Account\Driver;
 use App\Entity\Account\User;
+use App\Entity\Document\DriverLicense;
+use App\GraphQL\Account\Input\DriverLicenseInput;
 use App\GraphQL\Account\Input\DriverUpdateInput;
 use App\Repository\Account\DriverRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -38,6 +40,13 @@ class DriverQueryResolver
         return $driver;
     }
 
+    #[Query(name: "get_driver_driving_license",)]
+    public function getDriverLicense(): ?DriverLicense
+    {
+        $driver = $this->getDriver();
+        return $driver->getDrivingLicense();
+    }
+
     #[Mutation()]
     public function updateProfile(
         DriverUpdateInput $input,
@@ -51,6 +60,27 @@ class DriverQueryResolver
         $this->entityManager->flush();
 
         return $driver;
+    }
+
+
+
+
+    #[Mutation()]
+    public function updateDrivingLicense(
+        DriverLicenseInput $input,
+        ?String $clientMutationId = null,
+    ): ?DriverLicense {
+
+        $driver = $this->getDriver();
+        $license = $driver->getDrivingLicense() ?? new DriverLicense();
+        $input->build($license);
+
+        $driver->setDrivingLicense($license);
+
+        $this->entityManager->persist($driver);
+        $this->entityManager->flush();
+
+        return $license;
     }
 
 

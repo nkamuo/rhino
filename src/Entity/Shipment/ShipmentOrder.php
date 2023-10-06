@@ -126,7 +126,7 @@ class ShipmentOrder
     #[ORM\OneToMany(mappedBy: 'shipmentOrder', targetEntity: ShipmentDocument::class, cascade: ['persist', 'remove'])]
     private Collection $documents;
 
-    #[ORM\OneToOne(cascade: ['persist', 'remove'])]
+    #[ORM\OneToOne(inversedBy: 'shipmentOrder', cascade: ['persist', 'remove'])]
     private ?Review $review = null;
 
     #[GQL\Field()]
@@ -497,7 +497,8 @@ class ShipmentOrder
         return $this;
     }
 
-    public function updatedDocumentCount(){
+    public function updatedDocumentCount()
+    {
         $this->documentsCount = $this->documents->count();
     }
 
@@ -517,5 +518,4 @@ class ShipmentOrder
     {
         return $this->documentsCount;
     }
-
 }

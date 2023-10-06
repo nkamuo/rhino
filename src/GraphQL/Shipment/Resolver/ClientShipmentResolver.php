@@ -5,6 +5,7 @@ namespace App\GraphQL\Shipment\Resolver;
 use App\Entity\Account\User;
 use App\Entity\Addressing\UserAddress;
 use App\Entity\Catalog\UserProduct;
+use App\Entity\Shipment\Assessment\AssessmentParameter;
 use App\Entity\Shipment\Assessment\Review;
 use App\Entity\Shipment\Assessment\UnitReview;
 use App\Entity\Shipment\Shipment;
@@ -12,6 +13,7 @@ use App\Entity\Shipment\ShipmentBidStatus;
 use App\Entity\Shipment\ShipmentDriverBid;
 use App\Entity\Shipment\ShipmentItem;
 use App\Entity\Shipment\ShipmentOrder;
+use App\Entity\Shipment\ShipmentOrderStatus;
 use App\Entity\Shipment\ShipmentStatus;
 use App\GraphQL\Shipment\Input\Assessment\ShipmentOrderReviewInput;
 use App\GraphQL\Shipment\Input\ShipmentCreationInput;
@@ -23,12 +25,14 @@ use App\GraphQL\Shipment\Type\ShipmentDriverBidEdge;
 use App\GraphQL\Shipment\Type\ShipmentEdge;
 use App\Repository\Addressing\UserAddressRepository;
 use App\Repository\Catalog\UserProductRepository;
+use App\Repository\Shipment\Assessment\AssessmentParameterRepository;
 use App\Repository\Shipment\ShipmentDriverBidRepository;
 use App\Repository\Shipment\ShipmentRepository;
 use App\Service\Google\DirectionsServiceInterface;
 use App\Service\Identity\CodeGeneratorInterface;
 use App\Util\Doctrine\QueryBuilderHelper;
 use DateTimeImmutable;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
 use Overblog\GraphQLBundle\Annotation as GQL;
 use Overblog\GraphQLBundle\Annotation\Query;
@@ -56,6 +60,7 @@ class ClientShipmentResolver
         private UserAddressRepository $userAddressRepository,
         private UserProductRepository $userProductRepository,
         private ShipmentDriverBidRepository $shipmentDriverBidRepository,
+        private AssessmentParameterRepository $assessmentParameterRepository,
         private DirectionsServiceInterface $directionsService,
         private CodeGeneratorInterface $codeGenerator,
     ) {
@@ -246,10 +251,20 @@ class ClientShipmentResolver
     {
         $user = $this->getUser();
         $shipment = $this->getUserShipment($id, $user);
+        $order = $shipment->getShipmentOrder();
+
+        if ($order->getStatus() != ShipmentOrderStatus::DELIVERED) {
+            $message = sprintf(
+                "Only \"%s\" Shipment Orders can be reviewed. Shipment Order is in the \"%s\" state",
+                ShipmentOrderStatus::DELIVERED->name,
+                $order->getStatus()?->name
+            );
+            throw new UserError($message);
+        }
 
         if ($shipment->getStatus() != ShipmentStatus::DELIVERED) {
             $message = sprintf(
-                "Only \"%s\" Shipments can be published. Shipment is in the \"%s\" state",
+                "Only \"%s\" Shipments can be reviewed. Shipment is in the \"%s\" state",
                 ShipmentStatus::DELIVERED->name,
                 $shipment->getStatus()?->name
             );
@@ -257,15 +272,30 @@ class ClientShipmentResolver
         }
 
         $review = new Review();
-        $review->setDescription($input->description);
-        
+        $review
+            ->setReviewer($user)
+            ->setDescription($input->description);
+
+
+        $parameters = new ArrayCollection();
+
         foreach ($input->unitReviews as $uRevInputs) {
             $unitReview = new UnitReview();
+            $parameter = $this->getAssessmentParameter($uRevInputs->parameterId);
+            if ($parameters->contains($parameter)) {
+                throw new UserError("Cannot review {$parameter->getTitle()} more than once");
+            }
+            $parameters->add($parameter);
+
             $unitReview
+                ->setParameter($parameter)
                 ->setRating($uRevInputs->rating)
                 ->setDescription($uRevInputs->description);
             $review->addUnitReview($unitReview);
         }
+
+        $order->setReview($review);
+        $order->setStatus(ShipmentOrderStatus::COMPLETED);
         $shipment->setStatus(ShipmentStatus::COMPLETED);
 
         $this->entityManager->persist($shipment);
@@ -276,6 +306,14 @@ class ClientShipmentResolver
 
 
 
+    private function getAssessmentParameter(Ulid $id): AssessmentParameter
+    {
+        $parameter = $this->assessmentParameterRepository->find($id);
+        if (null == $parameter) {
+            throw new UserError("Could not find Shipment assessment parameter with [id:{$id}]");
+        }
+        return $parameter;
+    }
 
 
 

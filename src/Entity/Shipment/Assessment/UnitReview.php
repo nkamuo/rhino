@@ -30,7 +30,7 @@ class UnitReview
 
     #[GQL\Field()]
     #[ORM\Column(length: 32)]
-    private ?string $type = null;
+    private ?string $type = 'RATING';
 
     #[GQL\Field()]
     #[ORM\ManyToOne(inversedBy: 'unitReviews')]
@@ -40,7 +40,7 @@ class UnitReview
     #[GQL\Field()]
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
-    private ?AssessmentParameter $paramter = null;
+    private ?AssessmentParameter $parameter = null;
 
     public function getId(): ?Ulid
     {
@@ -95,14 +95,14 @@ class UnitReview
         return $this;
     }
 
-    public function getParamter(): ?AssessmentParameter
+    public function getParameter(): ?AssessmentParameter
     {
-        return $this->paramter;
+        return $this->parameter;
     }
 
-    public function setParamter(?AssessmentParameter $paramter): static
+    public function setParameter(?AssessmentParameter $parameter): static
     {
-        $this->paramter = $paramter;
+        $this->parameter = $parameter;
 
         return $this;
     }

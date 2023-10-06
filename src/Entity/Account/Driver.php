@@ -2,6 +2,7 @@
 
 namespace App\Entity\Account;
 
+use App\Entity\Document\DriverLicense;
 use App\Repository\Account\DriverRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
@@ -56,6 +57,9 @@ class Driver
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $dob = null;
 
+    #[GQL\Field()]
+    #[ORM\OneToOne(inversedBy: 'driver', cascade: ['persist', 'remove'])]
+    private ?DriverLicense $drivingLicense = null;
 
     public function __construct()
     {
@@ -160,6 +164,18 @@ class Driver
     public function setDob(?\DateTimeInterface $dob): static
     {
         $this->dob = $dob;
+
+        return $this;
+    }
+
+    public function getDrivingLicense(): ?DriverLicense
+    {
+        return $this->drivingLicense;
+    }
+
+    public function setDrivingLicense(?DriverLicense $drivingLicense): static
+    {
+        $this->drivingLicense = $drivingLicense;
 
         return $this;
     }

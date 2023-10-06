@@ -2,6 +2,8 @@
 
 namespace App\Entity\Shipment\Assessment;
 
+use App\Entity\Account\User;
+use App\Entity\Shipment\ShipmentOrder;
 use App\Repository\Shipment\Assessment\ReviewRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -11,7 +13,7 @@ use Overblog\GraphQLBundle\Annotation as GQL;
 use Symfony\Bridge\Doctrine\Types\UlidType;
 use Symfony\Component\Uid\Ulid;
 
-#[GQL\Type()]
+#[GQL\Type(name:'ShipmentAssessment')]
 #[ORM\Entity(repositoryClass: ReviewRepository::class)]
 class Review
 {
@@ -31,12 +33,21 @@ class Review
     private ?string $description = null;
 
     #[GQL\Field(type:'[UnitReview!]!')]
-    #[ORM\OneToMany(mappedBy: 'review', targetEntity: UnitReview::class, orphanRemoval: true)]
+    #[ORM\OneToMany(mappedBy: 'review', targetEntity: UnitReview::class, cascade:['persist','remove'], orphanRemoval: true)]
     private Collection $unitReviews;
 
     #[GQL\Field(type:'DateTime')]
     #[ORM\Column]
     private ?\DateTimeImmutable $createdAt = null;
+
+    #[GQL\Field()]
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?User $reviewer = null;
+    
+    #[GQL\Field()]
+    #[ORM\OneToOne(mappedBy: 'review')]
+    private ?ShipmentOrder $shipmentOrder = null;
 
     public function __construct()
     {
@@ -64,9 +75,17 @@ class Review
 
     public function calculateRating()
     {
-        $rating = 0;
+        $total = 0;
+        $count = 0;
         foreach ($this->getUnitReviews() as $unitReview) {
-            $rating += $unitReview->getRating() ?? 0;
+            $total += $unitReview->getRating() ?? 0;
+            $count++;
+        }
+        if($count === 0){
+            $rating = 0;
+        }
+        else{
+            $rating = ($total/$count);
         }
         $this->rating = $rating;
     }
@@ -123,6 +142,36 @@ class Review
     public function setCreatedAt(\DateTimeImmutable $createdAt): static
     {
         $this->createdAt = $createdAt;
+
+        return $this;
+    }
+
+    public function getReviewer(): ?User
+    {
+        return $this->reviewer;
+    }
+
+    public function setReviewer(?User $reviewer): static
+    {
+        $this->reviewer = $reviewer;
+
+        return $this;
+    }
+
+    
+    public function getShipmentOrder(): ?ShipmentOrder
+    {
+        return $this->shipmentOrder;
+    }
+
+    public function setShipmentOrder(ShipmentOrder $shipmentOrder): static
+    {
+        // set the owning side of the relation if necessary
+        if ($shipmentOrder->getReview() !== $this) {
+            $shipmentOrder->setReview($this);
+        }
+
+        $this->shipmentOrder = $shipmentOrder;
 
         return $this;
     }
