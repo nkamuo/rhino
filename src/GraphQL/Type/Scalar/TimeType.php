@@ -27,7 +27,7 @@ class TimeType
      */
     public static function parseValue($value)
     {
-        return new \DateTimeImmutable($value);
+        return DateTimeType::parseDateTime($value);
     }
 
     /**
@@ -37,6 +37,6 @@ class TimeType
      */
     public static function parseLiteral(Node $valueNode)
     {
-        return new \DateTimeImmutable($valueNode->value);
+        return DateTimeType::parseDateTime($valueNode->value);
     }
 }

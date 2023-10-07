@@ -65,6 +65,10 @@ class DriverLicense
     #[ORM\Column(length: 2)]
     private ?string $countryCode = null;
 
+    #[GQL\Field()]
+    #[ORM\Column(length: 32)]
+    private DriverLicenseStatus $status = DriverLicenseStatus::PENDING;
+
 
     public function __construct(){
         $this->createdAt = new \DateTimeImmutable();
@@ -206,6 +210,18 @@ class DriverLicense
     public function setCountryCode(string $countryCode): static
     {
         $this->countryCode = $countryCode;
+
+        return $this;
+    }
+
+    public function getStatus(): ?DriverLicenseStatus
+    {
+        return $this->status;
+    }
+
+    public function setStatus(DriverLicenseStatus $status): static
+    {
+        $this->status = $status;
 
         return $this;
     }

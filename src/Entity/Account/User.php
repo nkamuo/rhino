@@ -7,6 +7,7 @@ use App\Entity\Addressing\UserAddress;
 use App\Repository\Account\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Overblog\GraphQLBundle\Annotation as GQL;
 use Symfony\Bridge\Doctrine\Types\UlidType;
@@ -80,6 +81,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[GQL\Field(type: 'DateTime')]
     #[ORM\Column()]
     private ?\DateTimeImmutable $createdAt = null;
+
+    #[GQL\Field()]
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $avatar = null;
+
+    #[GQL\Field()]
+    #[ORM\Column(length: 32, nullable: true, enumType: Gender::class)]
+    private ?Gender $gender = null;
+
+    #[GQL\Field(type: 'Date')]
+    #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
+    private ?\DateTimeInterface $dob = null;
 
     public function __construct()
     {
@@ -288,6 +301,42 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setCreatedAt(\DateTimeImmutable $createdAt): static
     {
         $this->createdAt = $createdAt;
+
+        return $this;
+    }
+
+    public function getAvatar(): ?string
+    {
+        return $this->avatar;
+    }
+
+    public function setAvatar(?string $avatar): static
+    {
+        $this->avatar = $avatar;
+
+        return $this;
+    }
+
+    public function getGender(): ?Gender
+    {
+        return $this->gender;
+    }
+
+    public function setGender(?Gender $gender): static
+    {
+        $this->gender = $gender;
+
+        return $this;
+    }
+
+    public function getDob(): ?\DateTimeInterface
+    {
+        return $this->dob;
+    }
+
+    public function setDob(?\DateTimeInterface $dob): static
+    {
+        $this->dob = $dob;
 
         return $this;
     }

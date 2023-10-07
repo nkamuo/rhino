@@ -10,6 +10,11 @@ use Overblog\GraphQLBundle\Annotation\Scalar;
 #[Description('Represents the date-time instance for marking events')]
 class DateTimeType
 {
+    
+    public const FORMAT = 'D M d Y H:i:s e';
+
+
+
     /**
      * @param \DateTimeInterface $value
      *
@@ -27,7 +32,7 @@ class DateTimeType
      */
     public static function parseValue($value)
     {
-        return new \DateTimeImmutable($value);
+        return static::parseDateTime($value);
     }
 
     /**
@@ -37,6 +42,16 @@ class DateTimeType
      */
     public static function parseLiteral(Node $valueNode)
     {
-        return new \DateTimeImmutable($valueNode->value);
+        return static::parseDateTime($valueNode->value);
+    }
+
+    
+    public static function parseDateTime(string $dateString)
+    {
+        $dateTime = \DateTimeImmutable::createFromFormat(static::FORMAT, $dateString);
+        if ($dateTime) {
+            return $dateTime;
+        }
+        return new \DateTimeImmutable($dateString);
     }
 }

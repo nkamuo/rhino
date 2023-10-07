@@ -6,13 +6,10 @@ namespace App\GraphQL\Account\Resolver;
 use App\Entity\Account\Driver;
 use App\Entity\Account\User;
 use App\Entity\Document\DriverLicense;
-use App\GraphQL\Account\Input\DriverLicenseInput;
-use App\GraphQL\Account\Input\DriverUpdateInput;
 use App\Repository\Account\DriverRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Overblog\GraphQLBundle\Annotation as GQL;
 use Overblog\GraphQLBundle\Annotation\Arg;
-use Overblog\GraphQLBundle\Annotation\Mutation;
 use Overblog\GraphQLBundle\Annotation\Query;
 use Overblog\GraphQLBundle\Error\UserError;
 use Symfony\Bundle\SecurityBundle\Security;
@@ -20,10 +17,10 @@ use Symfony\Component\Uid\Ulid;
 
 
 #[GQL\Provider(
-    targetQueryTypes: ['DriverQuery'],
-    targetMutationTypes: ['DriverMutation'],
+    targetQueryTypes: ['ClientQuery'],
+    targetMutationTypes: ['ClientMutation'],
 )]
-class DriverQueryResolver
+class DriverLicenseResolver
 {
 
     public function __construct(
@@ -34,52 +31,28 @@ class DriverQueryResolver
     }
 
 
-    #[Query(name: "get_current_driver",)]
-    public function getCurrentDriver(): Driver
+    #[Query(name: "get_driver_driving_license",)]
+    #[Arg(name: 'id', type: 'Ulid')]
+    public function getDriverLicense(?Ulid $id): ?DriverLicense
     {
-        $driver = $this->getDriver();
-        return $driver;
-    }
-
-
-    #[Mutation()]
-    public function updateProfile(
-        DriverUpdateInput $input,
-    ): Driver {
-
-        $driver = $this->getDriver();
-
-        $input->build($driver);
-
-        $this->entityManager->persist($driver);
-        $this->entityManager->flush();
-
-        return $driver;
+        return $this->getDriver($id)->getDrivingLicense();
     }
 
 
 
-    #[Mutation()]
-    public function updateDrivingLicense(
-        DriverLicenseInput $input,
-        ?String $clientMutationId = null,
-    ): ?DriverLicense {
 
-        $driver = $this->getDriver();
-        $license = $driver->getDrivingLicense() ?? new DriverLicense();
-        $input->build($license);
-
-        $driver->setDrivingLicense($license);
-
-        $this->entityManager->persist($driver);
-        $this->entityManager->flush();
-
-        return $license;
-    }
+    // #[Query(name: "get_driver_driving_license",)]
+    // #[Arg(name: 'id', type: 'Ulid')]
+    // public function getDriverLicense(?Ulid $id): ?DriverLicense
+    // {
+    //     $driver = $this->getDriver();
+    //     return $driver->getDrivingLicense();
+    // }
 
 
 
-    private function getDriver(?Ulid $id = null): Driver
+
+    private function getDriver(?Ulid $id): Driver
     {
         if (null == $id) {
             $driver = $this->fetchCurrentDriver();
@@ -91,7 +64,6 @@ class DriverQueryResolver
         }
         return $driver;
     }
-
 
 
     private function fetchCurrentDriver(): Driver

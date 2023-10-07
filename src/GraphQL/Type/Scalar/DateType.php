@@ -1,4 +1,5 @@
 <?php
+
 namespace App\GraphQL\Type\Scalar;
 
 use GraphQL\Language\AST\Node;
@@ -10,6 +11,7 @@ use Overblog\GraphQLBundle\Annotation\Scalar;
 #[Description('Represents the date-time instance for marking events')]
 class DateType
 {
+
     /**
      * @param \DateTimeInterface $value
      *
@@ -27,7 +29,7 @@ class DateType
      */
     public static function parseValue($value)
     {
-        return new \DateTimeImmutable($value);
+        return DateTimeType::parseDateTime($value);
     }
 
     /**
@@ -37,6 +39,6 @@ class DateType
      */
     public static function parseLiteral(Node $valueNode)
     {
-        return new \DateTimeImmutable($valueNode->value);
+        return DateTimeType::parseDateTime($valueNode->value);
     }
 }
