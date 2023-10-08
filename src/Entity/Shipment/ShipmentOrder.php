@@ -133,6 +133,14 @@ class ShipmentOrder
     #[ORM\Column]
     private ?int $documentsCount = 0;
 
+    #[GQL\Field(type: 'DateTime')]
+    #[ORM\Column(nullable: true)]
+    private ?\DateTimeImmutable $pickedupAt = null;
+
+    #[GQL\Field(type: 'DateTime')]
+    #[ORM\Column(nullable: true)]
+    private ?\DateTimeImmutable $deliveredAt = null;
+
 
     public function __construct()
     {
@@ -517,5 +525,29 @@ class ShipmentOrder
     public function getDocumentsCount(): ?int
     {
         return $this->documentsCount;
+    }
+
+    public function getPickedupAt(): ?\DateTimeImmutable
+    {
+        return $this->pickedupAt;
+    }
+
+    public function setPickedupAt(?\DateTimeImmutable $pickedupAt): static
+    {
+        $this->pickedupAt = $pickedupAt;
+
+        return $this;
+    }
+
+    public function getDeliveredAt(): ?\DateTimeImmutable
+    {
+        return $this->deliveredAt;
+    }
+
+    public function setDeliveredAt(?\DateTimeImmutable $deliveredAt): static
+    {
+        $this->deliveredAt = $deliveredAt;
+
+        return $this;
     }
 }

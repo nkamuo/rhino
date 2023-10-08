@@ -9,6 +9,10 @@ use App\Entity\Shipment\ShipmentDriverBid;
 use App\Entity\Shipment\ShipmentStatus;
 use App\Entity\Vehicle\Vehicle;
 use App\GraphQL\Shipment\Input\ShipmentBidCreationInput;
+use App\GraphQL\Shipment\Type\Filter\ShipmentAddressFilterEntry;
+use App\GraphQL\Shipment\Type\Filter\ShipmentAddressFilterEntryConnection;
+use App\GraphQL\Shipment\Type\Filter\ShipmentAddressFilterEntryEdge;
+use App\GraphQL\Shipment\Type\Filter\ShipmentAddressSequence;
 use App\GraphQL\Shipment\Type\ShipmentConnection;
 use App\GraphQL\Shipment\Type\ShipmentDriverBidConnection;
 use App\GraphQL\Shipment\Type\ShipmentDriverBidEdge;
@@ -74,7 +78,6 @@ class DriverShipmentResolver
 
 
     #[GQL\Query(name: "get_load_list")]
-    // #[GQL\Access("isGranted('ROLE_USER')")]
     public function getShipmentConnection(
         ?int $first,
         ?String $after,
@@ -91,7 +94,7 @@ class DriverShipmentResolver
         $qb = $this->shipmentRepository
             ->createQueryBuilder('shipment')
             ->andWhere('shipment.status = :status')
-            ->setParameter('status',ShipmentStatus::PUBLISHED);
+            ->setParameter('status', ShipmentStatus::PUBLISHED);
 
 
         QueryBuilderHelper::applyCriteria($qb, $filter, 'shipment');
@@ -103,6 +106,93 @@ class DriverShipmentResolver
                 ->setMaxResults($limit)
                 ->getQuery()
                 ->getResult();
+        }, false, $cb);
+
+        return $paginator->auto(new Argument(['first' => $first, 'after' => $after]), $total);
+    }
+
+
+
+
+
+    #[GQL\Query(name: "get_load_address_filter_list")]
+    public function getShipmentAddressFilterConnection(
+        ShipmentAddressSequence $sequence,
+        ?int $first,
+        ?String $after,
+        ?String $filter,
+        ?String $sort,
+    ): ShipmentAddressFilterEntryConnection {
+
+        $cb = new ConnectionBuilder(
+            null,
+            fn ($edges, PageInfoInterface $pageInfo) => new ShipmentAddressFilterEntryConnection($edges, $pageInfo),
+            fn (string $coursor, array $res, int $index) => new ShipmentAddressFilterEntryEdge($coursor, ShipmentAddressFilterEntry::create($res))
+        );
+
+        // ShipmentAddressFilterEntry
+        $qb = $this->shipmentRepository
+            ->createQueryBuilder('shipment')
+            ->andWhere('shipment.status = :status')
+            ->setParameter('status', ShipmentStatus::PUBLISHED);
+
+        if ($sequence == ShipmentAddressSequence::ORIGIN) {
+            $qb->innerJoin('shipment.originAddress', 'address');
+        } elseif ($sequence == ShipmentAddressSequence::DESTINATION) {
+            $qb->innerJoin('shipment.destinationAddress', 'address');
+        }
+
+        QueryBuilderHelper::applyCriteria($qb, $filter, 'shipment');
+
+
+        $options = ['address.countryCode', 'address.provinceCode', 'address.city',];
+        $coalease = implode(',\'-\',', $options);
+        $reference = sprintf('CONCAT(%s)', $coalease);
+         $qb
+            // ->select(sprintf('%s AS HIDDEN %s', $reference, 'reference'))
+            ->select($options)
+            ->addSelect('COUNT(shipment.id) AS count')
+            // ->addGroupBy(sprintf('CONCAT(%s)', $coalease,))
+            // ->groupBy('reference')
+            // ->addSelect('DISTINCT address_label ')
+        ;
+
+
+        $countQuery = (clone $qb)->select(sprintf('COUNT(DISTINCT %s)',$reference))->getQuery();
+        $dql = $countQuery->getDQL();
+        $total = fn () => (int) $countQuery->getSingleScalarResult();
+        $paginator = new Paginator(function (?int $offset, ?int $limit) use ($qb, $options) {
+
+            foreach ($options as $option) {
+                $qb->addGroupBy("{$option}");
+            }
+
+            $query = $qb
+                ->setFirstResult($offset)
+                ->setMaxResults($limit)
+                ->getQuery();
+
+            $dql = $query->getDQL();
+
+            $result = $query->getResult();
+
+            return $result;
+
+
+            // $final = [];
+
+            // foreach ($result as $entry) {
+            //     $reference = $entry['reference'];
+            //     list($country, $province, $city) = explode('-', $reference);
+            //     $final[] = [
+            //         'city' => $city,
+            //         'province' => $province,
+            //         'country' => $country,
+            //         'count' => $entry['count'],
+            //     ];
+            // }
+
+            // return $final;
         }, false, $cb);
 
         return $paginator->auto(new Argument(['first' => $first, 'after' => $after]), $total);
@@ -128,7 +218,7 @@ class DriverShipmentResolver
         return $bid;
     }
 
-    
+
     #[GQL\Query(name: "get_load_bid_list")]
     // #[GQL\Access("isGranted('ROLE_USER')")]
     public function getShipmentDriverBidConnection(
@@ -184,8 +274,7 @@ class DriverShipmentResolver
             ->setDriver($driver)
             ->setVehicle($vehicle)
             ->setTitle($input->title)
-            ->setDescription($input->description)
-            ;
+            ->setDescription($input->description);
 
         if ($input->pickupAt) {
             $bid->setPickupAt(DateTimeImmutable::createFromInterface($input->pickupAt));
@@ -289,15 +378,17 @@ class DriverShipmentResolver
 
 
 
-    private function getBiddableShipmentById(Ulid $id): Shipment{
+    private function getBiddableShipmentById(Ulid $id): Shipment
+    {
         $shipment = $this->getShipmentById($id);
         //TODO: Confirm that a bid  can be placed against this shipment otherwise throw
         return $shipment;
     }
 
-    private function getShipmentById(Ulid $id): Shipment{
+    private function getShipmentById(Ulid $id): Shipment
+    {
         $shipment = $this->shipmentRepository->find($id);
-        if(null == $shipment){
+        if (null == $shipment) {
             throw new UserError("Cannot find shipment with [id: {$id}]");
         }
         return $shipment;

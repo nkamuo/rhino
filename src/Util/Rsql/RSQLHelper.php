@@ -328,7 +328,7 @@ class DoctrineQueryBuilder
                             $case = $enumType::from($value);
                         } catch (\Throwable $e) {
                             $cases = [];
-                            foreach($enumType::cases() as $v){
+                            foreach ($enumType::cases() as $v) {
                                 $cases[$v->name] = $v;
                             }
 
@@ -493,14 +493,31 @@ class DoctrineQueryBuilder
         });
 
 
-        $this->addOperator('=sameweek=', function (QueryBuilder $qb, string $rootName, string $alias, ?string $type, ?string $value) {
-            // list($rootName, $alias, $type) = $this->getOrJoinField($qb, $attrName);
-
+        $this->addOperator('=sameweek=', function (QueryBuilder $qb, string $rootName, string $alias, ?string $type, string|\DateTimeInterface $value) {
             $param = uniqid(':param_');
             $qb->setParameter($param, $value);
             //
             $field = "{$rootName}{$alias}";
             return "WEEK($field) = WEEK($param) AND YEAR($field) = YEAR($param)"; //
+        });
+
+
+        $this->addOperator('=sameday=', function (QueryBuilder $qb, string $rootName, string $alias, ?string $type, string|\DateTimeInterface $value) {
+            $param = uniqid(':param_');
+            $qb->setParameter($param, $value);
+            //
+            $field = "{$rootName}{$alias}";
+            return "DATE($field) = DATE($param)"; //
+        });
+
+
+
+        $this->addOperator('=year=', function (QueryBuilder $qb, string $rootName, string $alias, ?string $type, string|\DateTimeInterface $value) {
+            $param = uniqid(':param_');
+            $qb->setParameter($param, $value);
+            //
+            $field = "{$rootName}{$alias}";
+            return "YEAR($field) = YEAR($param)"; //
         });
     }
 }

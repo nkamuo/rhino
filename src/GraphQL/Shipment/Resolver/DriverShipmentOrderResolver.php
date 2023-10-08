@@ -232,6 +232,7 @@ class DriverShipmentOrderResolver
             input: $input->document,
         );
         $order->setPickupConfirmation($document);
+        $order->setPickedupAt(new DateTimeImmutable());
         $order->setStatus(ShipmentOrderStatus::INTRANSIT);
         $shipment->setStatus(ShipmentStatus::INTRANSIT);
 
@@ -264,6 +265,7 @@ class DriverShipmentOrderResolver
             input: $input->document,
         );
         $order->setProofOfDelivery($document);
+        $order->setDeliveredAt(new DateTimeImmutable());
         $order->setStatus(ShipmentOrderStatus::DELIVERED);
         $shipment->setStatus(ShipmentStatus::DELIVERED);
 

@@ -2,6 +2,7 @@
 
 namespace App\GraphQL\Shipment\Resolver;
 
+use App\CQRS\CommandBusInterface;
 use App\Entity\Account\User;
 use App\Entity\Addressing\UserAddress;
 use App\Entity\Catalog\UserProduct;
@@ -23,6 +24,7 @@ use App\GraphQL\Shipment\Type\ShipmentConnection;
 use App\GraphQL\Shipment\Type\ShipmentDriverBidConnection;
 use App\GraphQL\Shipment\Type\ShipmentDriverBidEdge;
 use App\GraphQL\Shipment\Type\ShipmentEdge;
+use App\Message\Account\CalculateDriverRating;
 use App\Repository\Addressing\UserAddressRepository;
 use App\Repository\Catalog\UserProductRepository;
 use App\Repository\Shipment\Assessment\AssessmentParameterRepository;
@@ -63,6 +65,7 @@ class ClientShipmentResolver
         private AssessmentParameterRepository $assessmentParameterRepository,
         private DirectionsServiceInterface $directionsService,
         private CodeGeneratorInterface $codeGenerator,
+        private CommandBusInterface $commandBus,
     ) {
     }
 
@@ -300,6 +303,9 @@ class ClientShipmentResolver
 
         $this->entityManager->persist($shipment);
         $this->entityManager->flush();
+
+        $driver = $order->getDriver();
+        $this->commandBus->dispatch(new CalculateDriverRating($driver));
 
         return $shipment;
     }

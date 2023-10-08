@@ -61,6 +61,10 @@ class Driver
     #[ORM\OneToOne(inversedBy: 'driver', cascade: ['persist', 'remove'])]
     private ?DriverLicense $drivingLicense = null;
 
+    #[GQL\Field()]
+    #[ORM\Embedded(columnPrefix: 'review_')]
+    private ?ReviewSummary $review = null;
+
     public function __construct()
     {
         $this->createdAt = new \DateTimeImmutable();
@@ -177,6 +181,16 @@ class Driver
     {
         $this->drivingLicense = $drivingLicense;
 
+        return $this;
+    }
+
+    
+    public function getReview(): ?ReviewSummary{
+        return $this->review;
+    }
+
+    public function setReview(ReviewSummary $review): static{
+        $this->review = $review;
         return $this;
     }
 }
