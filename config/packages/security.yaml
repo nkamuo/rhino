@@ -42,6 +42,7 @@ security:
         - { path: ^/api/login, roles: PUBLIC_ACCESS }
         # - { path: ^/graphql,       roles: IS_AUTHENTICATED_FULLY }
         - { path: ^/graphql/graphql/user, roles: IS_AUTHENTICATED_FULLY }
+        - { path: ^/graphql/graphql/client, roles: IS_AUTHENTICATED_FULLY }
         - { path: ^/graphql/graphql/driver, roles: ROLE_DRIVER }
         - { path: ^/graphql/graphql/admin, roles: ROLE_ADMIN }
 

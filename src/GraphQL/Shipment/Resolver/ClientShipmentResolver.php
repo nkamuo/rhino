@@ -3,9 +3,13 @@
 namespace App\GraphQL\Shipment\Resolver;
 
 use App\CQRS\CommandBusInterface;
+use App\CQRS\QueryBusInterface;
 use App\Entity\Account\User;
 use App\Entity\Addressing\UserAddress;
 use App\Entity\Catalog\UserProduct;
+use App\Entity\Chat\AbstractChatChannel;
+use App\Entity\Chat\ChatChannel;
+use App\Entity\Chat\ChatSubject;
 use App\Entity\Shipment\Assessment\AssessmentParameter;
 use App\Entity\Shipment\Assessment\Review;
 use App\Entity\Shipment\Assessment\UnitReview;
@@ -16,6 +20,7 @@ use App\Entity\Shipment\ShipmentItem;
 use App\Entity\Shipment\ShipmentOrder;
 use App\Entity\Shipment\ShipmentOrderStatus;
 use App\Entity\Shipment\ShipmentStatus;
+use App\GraphQL\Chat\Input\Message\ChatMessageCreationInput;
 use App\GraphQL\Shipment\Input\Assessment\ShipmentOrderReviewInput;
 use App\GraphQL\Shipment\Input\ShipmentCreationInput;
 use App\GraphQL\Shipment\Input\ShipmentItemInput;
@@ -30,6 +35,7 @@ use App\Repository\Catalog\UserProductRepository;
 use App\Repository\Shipment\Assessment\AssessmentParameterRepository;
 use App\Repository\Shipment\ShipmentDriverBidRepository;
 use App\Repository\Shipment\ShipmentRepository;
+use App\Service\Chat\DirectMessageResolverInterface;
 use App\Service\Google\DirectionsServiceInterface;
 use App\Service\Identity\CodeGeneratorInterface;
 use App\Util\Doctrine\QueryBuilderHelper;
@@ -65,7 +71,9 @@ class ClientShipmentResolver
         private AssessmentParameterRepository $assessmentParameterRepository,
         private DirectionsServiceInterface $directionsService,
         private CodeGeneratorInterface $codeGenerator,
+        private QueryBusInterface $queryBus,
         private CommandBusInterface $commandBus,
+        private DirectMessageResolverInterface $dmResolver,
     ) {
     }
 
@@ -461,6 +469,45 @@ class ClientShipmentResolver
 
 
         return true;
+    }
+
+
+
+
+    #[GQL\Mutation()]
+    #[GQL\Arg(name: 'id', type: 'Ulid!')]
+    public function resolveShipmentBidChannel(Ulid $id): AbstractChatChannel
+    {
+        $bid = $this->getUserShipmentBid($id);
+        $driver = $bid->getDriver();
+        $driverUserAccount = $driver->getUserAccount();
+        $shipment = $bid->getShipment();
+        $user = $this->getUser();
+
+        // $subject = $this->queryBus->query(new FindCha)
+
+        $conversation = $this->dmResolver->resolveSendingConversation(
+            $user,
+            $driverUserAccount,
+            true
+        );
+        $channel = $conversation->getChannel();
+
+        $subject = new ChatSubject();
+        $title = sprintf('Conversation on a shipment bid');
+        $reference = sprintf('%s:%s', 'shipment.bid.conversation', $bid->getId());
+        $subject
+            ->setTitle($title)
+            // ->setReference($reference)
+            ;
+
+        // $message 
+
+        // $this->entityManager->persist($shipment);
+        // $this->entityManager->flush();
+
+
+        return $channel;
     }
 
 

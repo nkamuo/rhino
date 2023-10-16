@@ -67,6 +67,10 @@ class Vehicle
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $description = null;
 
+    #[GQL\Field()]
+    #[ORM\Column(length: 64, nullable: true)]
+    private ?string $label = null;
+
 
     public function __construct(?Ulid $id = null)
     {
@@ -207,6 +211,18 @@ class Vehicle
     public function setDescription(?string $description): static
     {
         $this->description = $description;
+
+        return $this;
+    }
+
+    public function getLabel(): ?string
+    {
+        return $this->label;
+    }
+
+    public function setLabel(?string $label): static
+    {
+        $this->label = $label;
 
         return $this;
     }

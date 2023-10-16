@@ -23,21 +23,39 @@ class AbstractMessage
     #[ORM\CustomIdGenerator(class: 'doctrine.ulid_generator')]
     private ?Ulid $id = null;
 
+
+    #[GQL\Field()]
+    #[ORM\ManyToOne(inversedBy: 'messages')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?AbstractChatChannel $channel = null;
+
+
+
+    #[GQL\Field()]
+    #[ORM\ManyToOne(inversedBy: 'messages')]
+    private ?ChatSubject $subject = null;
+
+
+    #[GQL\Field()]
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?AbstractChatParticipant $participant = null;
+
     #[GQL\Field()]
     #[ORM\Column(length: 100, nullable: true)]
     private ?string $title = null;          //VERY MUCH OPTIONAL
 
     #[GQL\Field()]
-    #[ORM\Column(length: 4000)]
+    #[ORM\Column(length: 4000, nullable: true)]
     private ?string $body = null;
 
-    
-    #[GQL\Field(type:'[ChatMessageAttachment!]!')]
-    #[ORM\OneToMany(mappedBy: 'message', targetEntity: ChatMessageAttachment::class, orphanRemoval: true)]
+
+    #[GQL\Field(type: '[ChatMessageAttachment!]!')]
+    #[ORM\OneToMany(mappedBy: 'message', targetEntity: ChatMessageAttachment::class, cascade: ['persist', 'remove'], orphanRemoval: true)]
     private Collection $attachments;
 
 
-    #[GQL\Field(type:'[ChatMessageView!]!')]
+    #[GQL\Field(type: '[ChatMessageView!]!')]
     #[ORM\OneToMany(mappedBy: 'message', targetEntity: ChatMessageView::class, orphanRemoval: true)]
     private Collection $chatMessageViews;
 
@@ -45,7 +63,7 @@ class AbstractMessage
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $sentAt = null;
 
-    
+
     #[GQL\Field(type: 'DateTime')]
     #[ORM\Column]
     private ?\DateTimeImmutable $createdAt = null;
@@ -65,7 +83,49 @@ class AbstractMessage
         return $this->id;
     }
 
-  
+
+
+
+    public function getChannel(): ?AbstractChatChannel
+    {
+        return $this->channel;
+    }
+
+    public function setChannel(?AbstractChatChannel $channel): self
+    {
+        $this->channel = $channel;
+
+        return $this;
+    }
+
+
+
+
+    public function getSubject(): ?ChatSubject
+    {
+        return $this->subject;
+    }
+
+    public function setSubject(?ChatSubject $subject): self
+    {
+        $this->subject = $subject;
+
+        return $this;
+    }
+
+
+    public function getParticipant(): ?AbstractChatParticipant
+    {
+        return $this->participant;
+    }
+
+    public function setParticipant(?AbstractChatParticipant $participant): self
+    {
+        $this->participant = $participant;
+
+        return $this;
+    }
+
     public function getTitle(): ?string
     {
         return $this->title;
@@ -83,14 +143,14 @@ class AbstractMessage
         return $this->body;
     }
 
-    public function setBody(string $body): self
+    public function setBody(?string $body): self
     {
         $this->body = $body;
 
         return $this;
     }
 
-     /**
+    /**
      * @return Collection<int, ChatMessageAttachment>
      */
     public function getAttachments(): Collection
@@ -144,7 +204,7 @@ class AbstractMessage
         return $this;
     }
 
-   
+
 
     /**
      * @return Collection<int, ChatMessageView>
@@ -175,5 +235,4 @@ class AbstractMessage
 
         return $this;
     }
-
 }

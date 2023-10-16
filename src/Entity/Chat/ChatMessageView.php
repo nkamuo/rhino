@@ -12,10 +12,11 @@ use Symfony\Component\Uid\Ulid;
 #[ORM\Entity(repositoryClass: ChatMessageViewRepository::class)]
 class ChatMessageView
 {
-    #[GQL\Field(type: 'Ulid')]
+    #[GQL\Field(type: "Ulid")]
     #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column(type: UlidType::NAME)]
+    #[ORM\Column(type: UlidType::NAME, unique: true)]
+    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
+    #[ORM\CustomIdGenerator(class: 'doctrine.ulid_generator')]
     private ?Ulid $id = null;
 
     #[GQL\Field()]

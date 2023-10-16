@@ -9,7 +9,9 @@ use App\Util\Rsql\Operator\GreaterThan;
 use App\Util\Rsql\Operator\GreaterThanOrEqualTo;
 use App\Util\Rsql\Operator\LessThan;
 use App\Util\Rsql\Operator\LessThanOrEqualTo;
+use App\Util\Rsql\Operator\NotIn;
 use App\Util\Rsql\Operator\NotLike;
+use App\Util\Rsql\Operator\Out;
 use App\Util\Rsql\Operator\SameWeek;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\DBAL\Types\Types;
@@ -29,6 +31,8 @@ use Oilstone\RsqlParser\Parser;
 Operators::custom(LessThanOrEqualTo::class);
 Operators::custom(GreaterThanOrEqualTo::class); // ADD THESE FIRST SO THAT >,<,= are not parsed as seperate operators
 Operators::custom(NotLike::class);
+Operators::custom(NotIn::class);
+Operators::custom(Out::class);
 Operators::custom(EqualTo::class);
 Operators::custom(LessThan::class);
 Operators::custom(GreaterThan::class);
@@ -317,29 +321,41 @@ class DoctrineQueryBuilder
                     // VarDumper::dump($fieldMapping);
                     $fieldMapping = ((array) $fieldMapping);
 
-                    $enumValue = null;
+                    $enumValue = [];
                     if (isset($fieldMapping['enumType'])) {
                         $enumType = $fieldMapping['enumType'];
 
                         $mCases = ShipmentOrderStatus::cases();
 
                         $case = null;
-                        try {
-                            $case = $enumType::from($value);
-                        } catch (\Throwable $e) {
-                            $cases = [];
-                            foreach ($enumType::cases() as $v) {
-                                $cases[$v->name] = $v;
-                            }
-
-                            if (isset($cases[$value])) {
-                                $case = $cases[$value];
-                            } else {
-                                throw $e;
-                            }
+                        $values = $value;
+                        $isArray = is_array($values);
+                        if (!$isArray) {
+                            $values = [$values];
                         }
 
-                        $enumValue = $case->value;
+                        foreach ($values as $value) {
+                            try {
+                                $case = $enumType::from($value);
+                            } catch (\Throwable $e) {
+                                $cases = [];
+                                foreach ($enumType::cases() as $v) {
+                                    $cases[$v->name] = $v;
+                                }
+
+                                if (isset($cases[$value])) {
+                                    $case = $cases[$value];
+                                } else {
+                                    throw $e;
+                                }
+                            }
+                            $enumValue[] = $case->value;
+                        }
+
+                        if(!$isArray){
+                            $enumValue = $enumValue[0]?? null;
+                        }
+
                     }
 
                     $type = ((array) $fieldMapping)['type'];
@@ -408,6 +424,17 @@ class DoctrineQueryBuilder
             return $qb->expr()->gte("{$rootName}{$alias}", ":{$param}");
         };
 
+        $notIn = function (QueryBuilder $qb, string $rootName, string $alias, string $type, array $values) {
+            $querySegment = 'NOT IN(';
+            $params = [];
+            foreach ($values as $value) {
+                $param = uniqid(':param_');
+                $params[] = $param;
+                $qb->setParameter($param, $value, $type);
+            }
+            $querySegment .= implode(',', $params) . ')';
+            return "{$rootName}{$alias} " . $querySegment;
+        };
 
 
         $this->addOperator('==', $equalTo);
@@ -470,17 +497,9 @@ class DoctrineQueryBuilder
             return "{$rootName}{$alias} " . $querySegment;
         });
 
-        $this->addOperator('=notin=', function (QueryBuilder $qb, string $rootName, string $alias, string $type, array $values) {
-            $querySegment = 'NOT IN(';
-            $params = [];
-            foreach ($values as $value) {
-                $param = uniqid(':param_');
-                $params[] = $value;
-                $qb->setParameter($param, $value, $type);
-            }
-            $querySegment .= implode(',', $params) . ')';
-            return "{$rootName}{$alias} " . $querySegment;
-        });
+        $this->addOperator('=not-in=', $notIn);
+        $this->addOperator('=notin=', $notIn);
+        $this->addOperator('=out=', $notIn);
 
         $this->addOperator('=null=', function (QueryBuilder $qb, string $rootName, string $alias, ?string $type, ?string $value) {
             // list($rootName, $alias, $type) = $this->getOrJoinField($qb, $attrName);

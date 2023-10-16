@@ -8,7 +8,10 @@ use App\Entity\Account\User;
 use App\Entity\Document\DriverLicense;
 use App\GraphQL\Account\Input\DriverLicenseInput;
 use App\GraphQL\Account\Input\DriverUpdateInput;
+use App\GraphQL\Account\Type\DriverStatistics;
 use App\Repository\Account\DriverRepository;
+use App\Repository\Shipment\ShipmentDriverBidRepository;
+use App\Repository\Shipment\ShipmentOrderRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Overblog\GraphQLBundle\Annotation as GQL;
 use Overblog\GraphQLBundle\Annotation\Arg;
@@ -29,6 +32,8 @@ class DriverQueryResolver
     public function __construct(
         private EntityManagerInterface $entityManager,
         private DriverRepository $driverRepository,
+        private ShipmentOrderRepository $shipmentOrderRepository,
+        private ShipmentDriverBidRepository $shipmentDriverBidRepository,
         private Security $security,
     ) {
     }
@@ -39,6 +44,18 @@ class DriverQueryResolver
     {
         $driver = $this->getDriver();
         return $driver;
+    }
+
+    #[Query(name: "get_current_driver_stats",)]
+    public function getCurrentDriverStats(): DriverStatistics
+    {
+        $driver = $this->getCurrentDriver();
+        return DriverStatistics::create(
+            driver: $driver,
+            driverRepository: $this->driverRepository,
+            shipmentOrderRepository: $this->shipmentOrderRepository,
+            shipmentDriverBidRepository: $this->shipmentDriverBidRepository,
+        );
     }
 
 

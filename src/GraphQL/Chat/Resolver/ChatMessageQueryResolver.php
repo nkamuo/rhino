@@ -3,6 +3,7 @@
 namespace App\GraphQL\Chat\Resolver;
 
 use App\CQRS\QueryBusInterface;
+use App\Entity\Chat\AbstractChatParticipant;
 use App\Entity\Chat\ChatMessage;
 use App\Entity\Chat\ChatParticipant;
 use App\GraphQL\Chat\Type\ChatMessageConnection;
@@ -21,7 +22,10 @@ use Overblog\GraphQLBundle\Relay\Connection\PageInfoInterface;
 use Overblog\GraphQLBundle\Relay\Connection\Paginator;
 use Symfony\Component\Uid\Ulid;
 
-#[Provider(targetQueryTypes: 'Query')]
+#[Provider(
+    targetQueryTypes: ['Query', 'ClientQuery', 'DriverQuery'],
+    targetMutationTypes: ['Mutation', 'ClientMutation', 'DriverMutation'],
+)]
 class ChatMessageQueryResolver
 {
 
@@ -105,11 +109,11 @@ class ChatMessageQueryResolver
         $paginator = new Paginator(function (?int $offset, ?int $limit) use ($filter, $channelId, $subjectId, $participantId) {
 
             $query = (new SearchChatMessage(
-                    filter: $filter,
-                    offset: $offset,
-                    limit: $limit,
+                filter: $filter,
+                offset: $offset,
+                limit: $limit,
 
-                )
+            )
             )
                 ->setChannelId($channelId)
                 ->setSubjectId($subjectId)
@@ -124,7 +128,7 @@ class ChatMessageQueryResolver
 
 
 
-    private function getoptionalParticipantByChannelId(Ulid $channelId): ?ChatParticipant
+    private function getoptionalParticipantByChannelId(Ulid $channelId): ?AbstractChatParticipant
     {
         try {
             return $this->chatContextResolver->resolveCurrentChatParticipantForChannelId($channelId);

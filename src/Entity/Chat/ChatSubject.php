@@ -14,10 +14,11 @@ use Symfony\Component\Uid\Ulid;
 #[ORM\Entity(repositoryClass: ChatSubjectRepository::class)]
 class ChatSubject
 {
-    #[GQL\Field(type: 'Ulid')]
+    #[GQL\Field(type: "Ulid")]
     #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column(type: UlidType::NAME)]
+    #[ORM\Column(type: UlidType::NAME, unique: true)]
+    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
+    #[ORM\CustomIdGenerator(class: 'doctrine.ulid_generator')]
     private ?Ulid $id = null;
 
     #[GQL\Field()]
@@ -34,11 +35,15 @@ class ChatSubject
     private ?string $subtitle = null;
 
     /**
-     * @var ChatMessage[]
+     * @var Collection<int,ChatMessage>
      */
-    #[GQL\Field()]
+    #[GQL\Field(type:'[ChatMessage!]!')]
     #[ORM\OneToMany(mappedBy: 'subject', targetEntity: ChatMessage::class, cascade: ['persist','remove'])]
     private Collection $messages;
+
+    #[GQL\Field()]
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $reference = null;
 
     public function __construct(?Ulid $id = null)
     {
@@ -114,6 +119,18 @@ class ChatSubject
                 $message->setSubject(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getReference(): ?string
+    {
+        return $this->reference;
+    }
+
+    public function setReference(?string $reference): static
+    {
+        $this->reference = $reference;
 
         return $this;
     }

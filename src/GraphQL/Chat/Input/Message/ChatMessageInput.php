@@ -25,16 +25,14 @@ abstract class ChatMessageInput{
     public ?string $title = null;
     
     #[Field]
-    #[NotNull()]
-    #[NotBlank()]
     #[Length(max: 6400)]
     public ?string $body = null;
 
     
     /**
-     * @var UploadedFile[]
+     * @var ChatMessageAttachmentInput[]
      */
-    #[Field(type: '[UploadFile!]')]
+    #[Field(type: '[ChatMessageAttachmentInput!]')]
     public ?array $attachments = null;
 
     

@@ -2,10 +2,8 @@
 namespace App\Service\Chat;
 
 use App\Entity\Chat\ChatChannel;
-use App\Entity\Chat\ChatParticipant;
-use App\Entity\Chat\ChatUserParticipant;
+use App\Entity\Chat\AbstractChatParticipant;
 use App\Service\Chat\Exception\ChatChannelParticipanResolutionException;
-use Ramsey\Collection\Collection;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 use Symfony\Component\DependencyInjection\Attribute\TaggedIterator;
 use Symfony\Component\Uid\Ulid;
@@ -35,7 +33,7 @@ class ChainChatContextResolver implements ChatContextResolverInterface
 
         $this->resolvers = $contextResolvers;
     }
-    public function resolveCurrentChatParticipantForChannelId(Ulid $channelId): ChatParticipant
+    public function resolveCurrentChatParticipantForChannelId(Ulid $channelId): AbstractChatParticipant
     {
        foreach($this->resolvers as $resolver){
         try{
@@ -47,11 +45,11 @@ class ChainChatContextResolver implements ChatContextResolverInterface
         }
        }
 
-       throw new \BadFunctionCallException("Could not find a matching participant for the current reques");
+       throw new \BadFunctionCallException("Could not find a matching participant for the current request");
 ;    }
 
 
-    public function resolveCurrentChatParticipantForChannel(ChatChannel $channel): ChatUserParticipant
+    public function resolveCurrentChatParticipantForChannel(ChatChannel $channel): AbstractChatParticipant
     {
         return $this->resolveCurrentChatParticipantForChannelId($channel->getId());
     }

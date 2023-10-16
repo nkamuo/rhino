@@ -3,8 +3,11 @@
 namespace App\MessageHandler\Chat;
 
 use App\CQRS\QueryBusInterface;
+use App\Entity\Chat\AbstractChatChannel;
+use App\Entity\Chat\AbstractChatParticipant;
 use App\Entity\Chat\ChatChannel;
 use App\Entity\Chat\ChatMessage;
+use App\Entity\Chat\ChatMessageAttachment;
 use App\Entity\Chat\ChatParticipant;
 use App\Entity\Chat\ChatSubject;
 use App\Message\Chat\Channel\FindChannelById;
@@ -12,6 +15,7 @@ use App\Message\Chat\Message\CreateChatMessage;
 use App\Message\Chat\Message\DeleteChatMessage;
 use App\Message\Chat\Participant\FindParticipantById;
 use App\Message\Chat\Subject\FindSubjectById;
+use App\Repository\Chat\AbstractChatChannelRepository;
 use App\Repository\Chat\ChatChannelRepository;
 use App\Repository\Chat\ChatMessageRepository;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
@@ -23,10 +27,9 @@ final class ChatMessageMutationHandler
 
     public function __construct(
         private ChatMessageRepository $repository,
-        private ChatChannelRepository $chatChannelRepository,
+        private AbstractChatChannelRepository $chatChannelRepository,
         private QueryBusInterface $queryBus
     ) {
-
     }
 
     #[AsMessageHandler]
@@ -35,15 +38,14 @@ final class ChatMessageMutationHandler
         $message = new ChatMessage($command->getUid());
 
         $message
-            ->setBody($command->getBody())
-        ;
+            ->setBody($command->getBody());
 
 
         $channel = $participant = $subject = null;
 
         if ($channelId = $command->getChannelId()) {
             $channel = $this->queryBus->query(new FindChannelById($channelId));
-            if (!($channel instanceof ChatChannel))
+            if (!($channel instanceof AbstractChatChannel))
                 throw new \InvalidArgumentException("Could not find channel with [id:{$channelId}]");
             $channel->addMessage($message);
         }
@@ -51,7 +53,7 @@ final class ChatMessageMutationHandler
         if ($participantId = $command->getParticipantId()) {
 
             $participant = $this->queryBus->query(new FindParticipantById($participantId));
-            if (!($participant instanceof ChatParticipant))
+            if (!($participant instanceof AbstractChatParticipant))
                 throw new \InvalidArgumentException("Could not find participant with [id:{$participantId}]");
             $message->setParticipant($participant);
         }
@@ -62,6 +64,12 @@ final class ChatMessageMutationHandler
                 throw new \InvalidArgumentException("Could not find subject with [id:{$subjectId}]");
             $message->setSubject($subject);
             $subject->addMessage($message);
+        }
+
+        foreach ($command->getAttachments() as $file) {
+            $attachment = new ChatMessageAttachment();
+            $attachment->setUri($file->getUri());
+            $message->addAttachment($attachment);
         }
 
 
@@ -120,7 +128,5 @@ final class ChatMessageMutationHandler
             return;
         }
         $this->repository->remove($message, true);
-
     }
-
 }

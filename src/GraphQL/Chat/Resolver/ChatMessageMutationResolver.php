@@ -6,6 +6,7 @@ use App\CQRS\Command\Result\CQRSEntryCreationCommandResult;
 use App\CQRS\Command\Result\CQRSEntryUpdateCommandResult;
 use App\CQRS\CommandBusInterface;
 use App\CQRS\QueryBusInterface;
+use App\Entity\Chat\AbstractChatParticipant;
 use App\Entity\Chat\ChatParticipant;
 use App\GraphQL\Chat\Input\Message\ChatMessageCreationInput;
 use App\GraphQL\Chat\Input\Message\ChatMessageUpdateInput;
@@ -13,12 +14,17 @@ use App\Message\Chat\Message\CreateChatMessage;
 use App\Message\Chat\Message\DeleteChatMessage;
 use App\Message\Chat\Message\UpdateChatMessage;
 use App\Service\Chat\ChatContextResolverInterface;
+use App\Service\File\UploaderInterface;
 use Overblog\GraphQLBundle\Annotation\Arg;
 use Overblog\GraphQLBundle\Annotation\Mutation;
 use Overblog\GraphQLBundle\Annotation\Provider;
+use Overblog\GraphQLBundle\Error\UserError;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Uid\Ulid;
 
-#[Provider(targetMutationTypes: 'Mutation')]
+#[Provider(
+    targetMutationTypes: ['Mutation'],
+)]
 class ChatMessageMutationResolver
 {
 
@@ -26,6 +32,7 @@ class ChatMessageMutationResolver
         private CommandBusInterface $commandBus,
         private QueryBusInterface $queryBus,
         private ChatContextResolverInterface $chatContextResolver,
+        private UploaderInterface $uploader,
     ) {
     }
 
@@ -34,6 +41,10 @@ class ChatMessageMutationResolver
     public function createNewChatMessage(ChatMessageCreationInput $input, ?string $clientMutationId = null): CQRSEntryCreationCommandResult
     {
 
+        if (!(trim($input->body) || count($input->attachments))) {
+            throw new UserError("Message must specify a non-empty message body or contain at least one attachment ");
+        }
+
         $participant = $this->getParticipantByChannelId($input->channelId);
         $command = new CreateChatMessage();
         $command
@@ -41,6 +52,13 @@ class ChatMessageMutationResolver
             ->setSubjectId($input->subjectId)
             ->setParticipantId($participant->getId())
             ->setBody($input->body);
+
+        if ($input->attachments) {
+            foreach ($input->attachments as $attachment) {
+                $uri = $this->handleFileUpload($participant, $attachment->file);
+                $command->addAttachment($uri);
+            }
+        }
         return $this->commandBus->getMutationContext($clientMutationId)->dispatch($command);
     }
 
@@ -84,9 +102,15 @@ class ChatMessageMutationResolver
     }
 
 
+    private function handleFileUpload(AbstractChatParticipant $participant, UploadedFile $file): string
+    {
+        $channel = $participant->getChannel();
+        $path = sprintf('chat/%s', $channel->getId());
+        $uri = $this->uploader->upload($file, $path);
+        return $uri;
+    }
 
-
-    public function getParticipantByChannelId(Ulid $id): ChatParticipant
+    public function getParticipantByChannelId(Ulid $id): AbstractChatParticipant
     {
         return  $this->chatContextResolver->resolveCurrentChatParticipantForChannelId($id);
     }

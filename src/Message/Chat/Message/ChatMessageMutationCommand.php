@@ -11,6 +11,8 @@ use App\Message\Chat\Composition\ParticipantAwareMessageInterface;
 use App\Message\Chat\Composition\ParticipantAwareMessageTrait;
 use App\Message\Chat\Composition\SubjectAwareMessageInterface;
 use App\Message\Chat\Composition\SubjectAwareMessageTrait;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Symfony\Component\Uid\Ulid;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
@@ -25,13 +27,17 @@ abstract class ChatMessageMutationCommand implements EntityMutationCommandInterf
     private ?string $title = null;          //VERY MUCH OPTIONAL
 
     private ?string $body = null;
-    
 
+    /**
+     * @var Collection<int,ChatMessageAttachmentMutationCommand>
+     */
+    private Collection $attachments;
 
+    public function __construct()
+    {
+        $this->attachments = new ArrayCollection();
+    }
 
-
-
-    
     public function getTitle(): ?string
     {
         return $this->title;
@@ -56,5 +62,18 @@ abstract class ChatMessageMutationCommand implements EntityMutationCommandInterf
         return $this;
     }
 
-    
+
+    public function getAttachments(): Collection
+    {
+        return $this->attachments;
+    }
+
+
+    public function addAttachment(ChatMessageAttachmentMutationCommand | string $file)
+    {
+        if (is_string($file)) {
+            $file = new ChatMessageAttachmentMutationCommand($file);
+        }
+        $this->attachments->add($file);
+    }
 }

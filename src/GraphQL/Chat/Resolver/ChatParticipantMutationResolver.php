@@ -6,7 +6,7 @@ use App\CQRS\Command\Result\CQRSEntryCreationCommandResult;
 use App\CQRS\Command\Result\CQRSEntryUpdateCommandResult;
 use App\CQRS\CommandBusInterface;
 use App\CQRS\QueryBusInterface;
-use App\Entity\Chat\ChatParticipant;
+use App\Entity\Chat\AbstractChatParticipant;
 use App\GraphQL\Chat\Input\Message\ChatMessageCreationInput;
 use App\GraphQL\Chat\Input\Message\ChatMessageUpdateInput;
 use App\Message\Chat\Message\CreateChatMessage;
@@ -30,19 +30,19 @@ class ChatParticipantMutationResolver
     }
 
 
-    #[Mutation]
-    public function createNewChatMessage(ChatMessageCreationInput $input, ?string $clientMutationId = null): CQRSEntryCreationCommandResult
-    {
+    // #[Mutation]
+    // public function createNewChatMessage(ChatMessageCreationInput $input, ?string $clientMutationId = null): CQRSEntryCreationCommandResult
+    // {
 
-        $participant = $this->getParticipantByChannelId($input->channelId);
-        $command = new CreateChatMessage();
-        $command
-            ->setChannelId($input->channelId)
-            ->setSubjectId($input->subjectId)
-            ->setParticipantId($participant->getId())
-            ->setBody($input->body);
-        return $this->commandBus->getMutationContext($clientMutationId)->dispatch($command);
-    }
+    //     $participant = $this->getParticipantByChannelId($input->channelId);
+    //     $command = new CreateChatMessage();
+    //     $command
+    //         ->setChannelId($input->channelId)
+    //         ->setSubjectId($input->subjectId)
+    //         ->setParticipantId($participant->getId())
+    //         ->setBody($input->body);
+    //     return $this->commandBus->getMutationContext($clientMutationId)->dispatch($command);
+    // }
 
 
     #[Mutation()]
@@ -95,7 +95,7 @@ class ChatParticipantMutationResolver
 
 
 
-    public function getParticipantByChannelId(Ulid $id): ChatParticipant
+    public function getParticipantByChannelId(Ulid $id): AbstractChatParticipant
     {
         return  $this->chatContextResolver->resolveCurrentChatParticipantForChannelId($id);
     }

@@ -1,9 +1,11 @@
 <?php
 namespace App\MessageHandler\Chat;
+use App\Entity\Chat\AbstractChatParticipant;
 use App\Entity\Chat\ChatParticipant;
 use App\Message\Chat\Participant\CountParticipant;
 use App\Message\Chat\Participant\FindParticipantById;
 use App\Message\Chat\Participant\SearchParticipant;
+use App\Repository\Chat\AbstractChatParticipantRepository;
 use App\Repository\Chat\ChatParticipantRepository;
 use App\Util\Doctrine\QueryBuilderHelper;
 use Symfony\Bridge\Doctrine\Types\UlidType;
@@ -13,12 +15,12 @@ use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 class ChatParticipantQueryHandler{
 
 
-    public function __construct(private ChatParticipantRepository $repository){
+    public function __construct(private AbstractChatParticipantRepository $repository){
 
     }
     
     #[AsMessageHandler]
-    public function findOrderById(FindParticipantById $query): ?ChatParticipant{
+    public function findOrderById(FindParticipantById $query): ?AbstractChatParticipant{
         return $this->repository->find($query->getId());
     }
 

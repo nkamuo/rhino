@@ -3,6 +3,7 @@
 namespace App\GraphQL\Chat\Resolver;
 
 use App\CQRS\QueryBusInterface;
+use App\Entity\Chat\AbstractChatChannel;
 use App\Entity\Chat\ChatChannel;
 use App\GraphQL\Chat\Type\ChatChannelConnection;
 use App\GraphQL\Chat\Type\ChatChannelEdge;
@@ -34,7 +35,7 @@ class ChatChannelQueryResolver
         name: 'id',
         type: 'Ulid!'
     )]
-    public function getChatChannel(#[Arg(type: 'Ulid!')] Ulid $id): ?ChatChannel
+    public function getChatChannel(#[Arg(type: 'Ulid!')] Ulid $id): ?AbstractChatChannel
     {
         return $this->queryBus->query(new FindChannelById($id));
     }
@@ -51,7 +52,7 @@ class ChatChannelQueryResolver
         $cb = new ConnectionBuilder(
             null,
             fn ($edges, PageInfoInterface $pageInfo) => new ChatChannelConnection($edges, $pageInfo),
-            fn (string $coursor, ChatChannel $brand, int $index) => new ChatChannelEdge($coursor, $brand)
+            fn (string $coursor, AbstractChatChannel $brand, int $index) => new ChatChannelEdge($coursor, $brand)
         );
         $total = fn () => $this->queryBus->query(new CountChannel($filter));
         $paginator = new Paginator(function (?int $offset, ?int $limit) use ($filter) {

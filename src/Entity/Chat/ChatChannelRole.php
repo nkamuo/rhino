@@ -15,10 +15,11 @@ use Symfony\Component\Uid\Ulid;
 #[ORM\Entity(repositoryClass: ChatChannelRoleRepository::class)]
 class ChatChannelRole
 {
-    #[GQL\Field(type: 'Ulid')]
+    #[GQL\Field(type: "Ulid")]
     #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column(type: UlidType::NAME)]
+    #[ORM\Column(type: UlidType::NAME, unique: true)]
+    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
+    #[ORM\CustomIdGenerator(class: 'doctrine.ulid_generator')]
     private ?Ulid $id = null;
 
     #[GQL\Field()]
@@ -39,10 +40,10 @@ class ChatChannelRole
     private ?\DateTimeImmutable $createdAt = null;
 
     /**
-     * @var ChatParticipant[]
+     * 
      */
-    #[GQL\Field()]
-    #[ORM\OneToMany(mappedBy: 'role', targetEntity: ChatParticipant::class, cascade: ['persist','remove'],)]
+    #[GQL\Field(type: '[ChatParticipant!]!')]
+    #[ORM\OneToMany(mappedBy: 'role', targetEntity: ChatParticipant::class, cascade: ['persist', 'remove'],)]
     private Collection $chatParticipants;
 
     #[ORM\Column]

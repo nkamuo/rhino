@@ -1,11 +1,13 @@
 <?php
 namespace App\MessageHandler\Chat;
 
+use App\Entity\Chat\AbstractChatChannel;
 use App\Entity\Chat\ChatChannel;
 use App\Entity\Chat\ChatUserParticipant;
 use App\Message\Chat\Channel\CountChannel;
 use App\Message\Chat\Channel\FindChannelById;
 use App\Message\Chat\Channel\SearchChannel;
+use App\Repository\Chat\AbstractChatChannelRepository;
 use App\Repository\Chat\ChatChannelRepository;
 use App\Util\Doctrine\QueryBuilderHelper;
 use Doctrine\ORM\QueryBuilder;
@@ -17,13 +19,13 @@ class ChatChannelQueryHandler
 {
 
 
-    public function __construct(private ChatChannelRepository $repository)
+    public function __construct(private AbstractChatChannelRepository $repository)
     {
 
     }
 
     #[AsMessageHandler]
-    public function findOrderById(FindChannelById $query): ?ChatChannel
+    public function findOrderById(FindChannelById $query): ?AbstractChatChannel
     {
         return $this->repository->find($query->getId());
     }

@@ -10,33 +10,36 @@ use Symfony\Component\Uid\Ulid;
 class VehicleInput
 {
     #[GQL\Field()]
+    public string $label;
+
+    #[GQL\Field()]
     public string $vin;
 
-    
+
     #[GQL\Field()]
     public string $licensePlateNumber;
 
     #[GQL\Field()]
-    public ?string $description;
+    public ?string $description = null;
 
-    
+
     #[GQL\Field()]
     public int $maxWeightCapacity;
 
     #[GQL\Field()]
     public VehicleDimensionInput $dimension;
-    
+
     #[GQL\Field(type: "Ulid!")]
     public Ulid $vehicleTypeId;
 
     public function build(Vehicle $vehicle): void
     {
         $vehicle
+            ->setLabel($this->label)
             ->setVin($this->vin)
             ->setLicensePlateNumber($this->licensePlateNumber)
             ->setMaxWeightCapacity($this->maxWeightCapacity)
             ->setDimension($this->dimension?->toInstance())
-            ->setDescription($this->description)
-            ;
+            ->setDescription($this->description);
     }
 }
