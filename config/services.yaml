@@ -7,6 +7,9 @@ imports:
     - graphql/config.yaml
 parameters:
     google_maps.api_key: "%env(GOOGLE_MAPS_API_KEY)%"
+    stripe.publishable_key: "%env(STRIPE_PUBLISHABLE_KEY)%"
+    stripe.secret_key: "%env(STRIPE_SECRET_KEY)%"
+    driver.subscription.stripe_price_id: "%env(DRIVER_SUBSCRIPTION_STRIPE_PRICE_ID)%"
 
 services:
     # default configuration for services in *this* file

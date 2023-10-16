@@ -20,6 +20,9 @@ framework:
             Symfony\Component\Notifier\Message\ChatMessage: async
             Symfony\Component\Notifier\Message\SmsMessage: async
             App\Message\Account\CalculateDriverRating: async
+            App\Message\Account\Payment\SetupUserStipeProfile: async
+            App\Message\Account\Payment\SubscribeDriverProfile: async
+            App\Message\Account\Payment\SetupAllUserBillingProfile: async
 
             # Route your messages to the transports
             # 'App\Message\YourMessage': async
