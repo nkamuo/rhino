@@ -191,7 +191,7 @@ class DriverStatistics
 
     private static function validateDateRange(
         ?DateTimeInterface $from = null,
-        ?DateTimeInterface $to,
+        ?DateTimeInterface $to = null,
     ): void {
         if ($from && $to) {
             if ($from->diff($to)->f > 0) {
