@@ -45,11 +45,11 @@ class AssessmentParameterFixtures extends Fixture
 
 
         foreach ($data as $entry) {
-            $existing = $this->assessmentParameterRepository->findOneBy(['code' => $entry['code']]);
+            $parameter = $this->assessmentParameterRepository->findOneBy(['code' => $entry['code']]);
 
-            if ($existing)
-                continue;
-            $parameter = new AssessmentParameter();
+            if (!$parameter) {
+                $parameter = new AssessmentParameter();
+            }
             $parameter
                 ->setCode($entry['code'])
                 ->setTitle($entry['title'])
