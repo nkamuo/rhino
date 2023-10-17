@@ -50,10 +50,10 @@ class Driver
     private ?DriverAddress $address = null;
 
     #[GQL\Field()]
-    #[ORM\Column(length: 32, nullable: true, enumType:Gender::class)]
+    #[ORM\Column(length: 32, nullable: true, enumType: Gender::class)]
     private ?Gender $gender = null;
 
-    #[GQL\Field(type:'Date')]
+    #[GQL\Field(type: 'Date')]
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $dob = null;
 
@@ -68,6 +68,7 @@ class Driver
     public function __construct()
     {
         $this->createdAt = new \DateTimeImmutable();
+        $this->review = new ReviewSummary();
     }
 
     public function getId(): ?Ulid
@@ -184,12 +185,14 @@ class Driver
         return $this;
     }
 
-    
-    public function getReview(): ?ReviewSummary{
+
+    public function getReview(): ?ReviewSummary
+    {
         return $this->review;
     }
 
-    public function setReview(ReviewSummary $review): static{
+    public function setReview(ReviewSummary $review): static
+    {
         $this->review = $review;
         return $this;
     }
