@@ -65,6 +65,9 @@ class Driver
     #[ORM\Embedded(columnPrefix: 'review_')]
     private ?ReviewSummary $review = null;
 
+    #[ORM\OneToOne(inversedBy: 'driver', cascade: ['persist', 'remove'])]
+    private ?DriverSubscription $subscription = null;
+
     public function __construct()
     {
         $this->createdAt = new \DateTimeImmutable();
@@ -194,6 +197,18 @@ class Driver
     public function setReview(ReviewSummary $review): static
     {
         $this->review = $review;
+        return $this;
+    }
+
+    public function getSubscription(): ?DriverSubscription
+    {
+        return $this->subscription;
+    }
+
+    public function setSubscription(?DriverSubscription $subscription): static
+    {
+        $this->subscription = $subscription;
+
         return $this;
     }
 }

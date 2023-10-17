@@ -30,17 +30,30 @@ security:
                 success_handler: lexik_jwt_authentication.handler.authentication_success
                 failure_handler: lexik_jwt_authentication.handler.authentication_failure
         api:
-            pattern: ^/(api|graphql)
+            pattern: ^/(api|graphql|api/driver)
             stateless: true
             jwt: ~
 
         main:
             lazy: true
             provider: app_user_provider
+            custom_authenticator: App\Security\LoginFormAuthenticator
+            logout:
+                path: app_logout
+                # where to redirect after logout
+                # target: app_any_route
+
+            remember_me:
+                secret: '%kernel.secret%'
+                lifetime: 604800
+                path: /
+                always_remember_me: true
 
     access_control:
         - { path: ^/api/login, roles: PUBLIC_ACCESS }
         # - { path: ^/graphql,       roles: IS_AUTHENTICATED_FULLY }
+        # - { path: ^/driver, roles: ROLE_DRIVER }
+        - { path: ^/api/driver, roles: ROLE_DRIVER }
         - { path: ^/graphql/graphql/user, roles: IS_AUTHENTICATED_FULLY }
         - { path: ^/graphql/graphql/client, roles: IS_AUTHENTICATED_FULLY }
         - { path: ^/graphql/graphql/driver, roles: ROLE_DRIVER }

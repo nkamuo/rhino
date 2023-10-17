@@ -4,6 +4,7 @@ namespace App\Entity\Account;
 
 use App\Entity\Addressing\Address;
 use App\Entity\Addressing\UserAddress;
+use App\Entity\Payment\PaymentMethod;
 use App\Repository\Account\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -97,10 +98,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 225, nullable: true)]
     private ?string $stripeCustomerId = null;
 
+    #[ORM\OneToMany(mappedBy: 'owner', targetEntity: PaymentMethod::class, orphanRemoval: true)]
+    private Collection $paymentMethods;
+
     public function __construct()
     {
         $this->addressess = new ArrayCollection();
         $this->createdAt = new \DateTimeImmutable();
+        $this->paymentMethods = new ArrayCollection();
     }
 
     public function getId(): ?Ulid
@@ -358,6 +363,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setStripeCustomerId(string $stripeCustomerId): static
     {
         $this->stripeCustomerId = $stripeCustomerId;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, PaymentMethod>
+     */
+    public function getPaymentMethods(): Collection
+    {
+        return $this->paymentMethods;
+    }
+
+    public function addPaymentMethod(PaymentMethod $paymentMethod): static
+    {
+        if (!$this->paymentMethods->contains($paymentMethod)) {
+            $this->paymentMethods->add($paymentMethod);
+            $paymentMethod->setOwner($this);
+        }
+
+        return $this;
+    }
+
+    public function removePaymentMethod(PaymentMethod $paymentMethod): static
+    {
+        if ($this->paymentMethods->removeElement($paymentMethod)) {
+            // set the owning side to null (unless already changed)
+            if ($paymentMethod->getOwner() === $this) {
+                $paymentMethod->setOwner(null);
+            }
+        }
 
         return $this;
     }
